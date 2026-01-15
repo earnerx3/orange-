@@ -9,10 +9,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Firebase Compat SDK (HTML ফাইলে ব্যবহারের জন্য সেরা) -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <!-- Firebase SDK (Latest Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <style>
@@ -24,7 +24,7 @@
             --lemon-grad: linear-gradient(135deg, #FFD60A 0%, #FF9F0A 100%);
             --bg-dark: #0a0a0a;
             --card-bg: #151515;
-            --glass-bg: rgba(30, 30, 30, 0.75);
+            --glass-bg: rgba(30, 30, 30, 0.85);
             --glass-border: rgba(255, 159, 10, 0.2);
             --text-main: #ffffff;
             --text-muted: #a0a0a0;
@@ -243,6 +243,7 @@
         <i class="fas fa-lemon" style="color: var(--primary); font-size: 2rem; position: absolute; animation: pulse 2s infinite;"></i>
         <h3 class="gradient-text">Orange Earn</h3>
         <p class="bn" style="color: #666; font-size: 0.8rem; margin-top: 10px;">প্রিমিয়াম অভিজ্ঞতা লোড হচ্ছে...</p>
+        <div id="errorMsg" style="color: red; margin-top: 20px; font-size: 0.7rem; display:none;"></div>
     </div>
 
     <!-- Toast Notification -->
@@ -484,7 +485,11 @@
           measurementId: "G-3ZNHCM9H8J"
         };
 
-        firebase.initializeApp(firebaseConfig);
+        // Initialize Firebase safely
+        try {
+            firebase.initializeApp(firebaseConfig);
+        } catch(e) { console.error("Firebase Init Error:", e); }
+        
         const db = firebase.firestore();
         const auth = firebase.auth();
         const tg = window.Telegram.WebApp;
@@ -492,18 +497,18 @@
 
         // App Settings
         const AppConfig = {
-            botUsername: "Orange_lemon1_Bot", // Updated Bot
+            botUsername: "Orange_lemon1_Bot", 
             refBonus: 5.00,
             adReward: 2.00,
             adLimit: 10,
-            adZoneId: "10312256", // Keep your ad zone ID
+            adZoneId: "10312256", 
             withdraw: {
                 task: { min: 50, refReq: 0 },
-                ref: { min: 100, refReq: 5 } // Strict for ref withdraw
+                ref: { min: 100, refReq: 5 } 
             },
             verification: {
                 enabled: true,
-                link: "https://www.google.com/search?q=online+income", // Change this to your verify link
+                link: "https://www.google.com/search?q=online+income", 
                 clicks: 2
             }
         };
@@ -512,14 +517,24 @@
         let userData = {};
         let verifyClicks = 0;
 
-        // --- 2. INITIALIZATION ---
+        // --- 2. INITIALIZATION WITH FIXES ---
         async function init() {
+            // FIX: Clear Local Storage Cache to prevent conflicts
             try {
-                // Initialize Ad Script
+                // Clear old specific keys if they exist, or clean all if safe
+                if(!localStorage.getItem('orange_app_v1')) {
+                    console.log("Clearing old cache for fresh start...");
+                    localStorage.clear();
+                    localStorage.setItem('orange_app_v1', 'true');
+                }
+            } catch(e) { console.log("Cache clear skipped"); }
+
+            try {
+                // Load Ad Script
                 const script = document.createElement('script');
                 script.src = '//libtl.com/sdk.js';
                 script.dataset.zone = AppConfig.adZoneId;
-                script.dataset.sdk = 'show_ad'; // Custom name
+                script.dataset.sdk = 'show_ad'; 
                 document.head.appendChild(script);
 
                 // Auth Logic
@@ -532,11 +547,16 @@
                     photo = u.photo_url;
                     startParam = tg.initDataUnsafe.start_param;
                 } else {
-                    // Fallback for browser testing
-                    const cred = await auth.signInAnonymously();
-                    uid = cred.user.uid;
-                    name = "Guest";
-                    photo = "https://ui-avatars.com/api/?background=FF9F0A&color=fff&name=G";
+                    // Fallback to Anonymous Auth
+                    // NOTE: You MUST enable Anonymous Auth in Firebase Console -> Auth -> Sign-in method
+                    try {
+                        const cred = await auth.signInAnonymously();
+                        uid = cred.user.uid;
+                        name = "Guest";
+                        photo = "https://ui-avatars.com/api/?background=FF9F0A&color=fff&name=G";
+                    } catch(authErr) {
+                        throw new Error("Auth Failed! Enable Anonymous Auth in Firebase Console. " + authErr.message);
+                    }
                 }
 
                 currentUser = uid;
@@ -574,7 +594,7 @@
                 } else {
                     userData = doc.data();
                     // Update Name/Photo if changed
-                    if (userData.name !== name || userData.photo !== photo && photo) {
+                    if (userData.name !== name || (userData.photo !== photo && photo)) {
                         userRef.update({ name: name, photo: photo });
                     }
                     // Reset Daily Ads
@@ -592,24 +612,26 @@
                 // Show App
                 setTimeout(() => {
                     document.getElementById('appLoader').style.display = 'none';
-                    // Show Notice
                     document.getElementById('noticeText').innerText = "স্বাগতম Orange Earn এ! বেশি বেশি রেফার করুন এবং টপ লিডারবোর্ডে জায়গা করে নিন।";
                     document.getElementById('noticeModal').classList.add('show');
                 }, 1500);
 
             } catch (e) {
                 console.error(e);
-                alert("Connection Error! Please reload.");
+                const errDiv = document.getElementById('errorMsg');
+                errDiv.style.display = 'block';
+                errDiv.innerText = "Error: " + e.message;
+                // Don't use alert immediately, let them see the error message on screen
             }
         }
 
         // --- 3. UI RENDERING ---
         function renderUI() {
             // Header & Home
-            document.getElementById('userName').innerText = userData.name;
-            document.getElementById('userAvatar').src = userData.photo;
-            document.getElementById('profAvatar').src = userData.photo;
-            document.getElementById('profName').innerText = userData.name;
+            document.getElementById('userName').innerText = userData.name || "User";
+            document.getElementById('userAvatar').src = userData.photo || "https://ui-avatars.com/api/?name=User";
+            document.getElementById('profAvatar').src = userData.photo || "https://ui-avatars.com/api/?name=User";
+            document.getElementById('profName').innerText = userData.name || "User";
             document.getElementById('profId').innerText = userData.uid;
             document.getElementById('profRefCount').innerText = userData.referralCount || 0;
 
@@ -734,22 +756,23 @@
         async function loadLeaderboard() {
             const list = document.getElementById('leaderboardList');
             
-            // Local Cache Check
-            const cached = localStorage.getItem('lb_cache');
-            const cachedTime = localStorage.getItem('lb_time');
-            if (cached && cachedTime && (Date.now() - cachedTime < 600000)) { // 10 min cache
-                renderLeaderboard(JSON.parse(cached));
-                return;
-            }
+            // Check Cache (Robust)
+            try {
+                const cached = localStorage.getItem('orange_lb_cache');
+                const cachedTime = localStorage.getItem('orange_lb_time');
+                if (cached && cachedTime && (Date.now() - cachedTime < 600000)) { 
+                    renderLeaderboard(JSON.parse(cached));
+                    return;
+                }
+            } catch(e) { console.log("Cache error, fetching new"); }
 
             try {
-                // Query: Order by Referral Count
                 const snap = await db.collection('users').orderBy('referralCount', 'desc').limit(20).get();
                 let users = [];
                 snap.forEach(d => users.push(d.data()));
 
-                localStorage.setItem('lb_cache', JSON.stringify(users));
-                localStorage.setItem('lb_time', Date.now());
+                localStorage.setItem('orange_lb_cache', JSON.stringify(users));
+                localStorage.setItem('orange_lb_time', Date.now());
                 
                 renderLeaderboard(users);
             } catch (e) {
@@ -762,13 +785,18 @@
             let html = '';
             let rank = 1;
             
+            if(!users || users.length === 0) {
+                 list.innerHTML = "<p style='text-align:center; color:#666'>এখনও কেউ নেই</p>";
+                 return;
+            }
+
             users.forEach(u => {
                 const isTop = rank <= 3 ? 'top-rank' : '';
                 html += `
                 <div class="rank-item ${isTop}">
                     <div style="display:flex; align-items:center;">
                         <div class="rank-badge">${rank}</div>
-                        <img src="${u.photo}" style="width:35px; height:35px; border-radius:50%; margin-right:10px;">
+                        <img src="${u.photo}" style="width:35px; height:35px; border-radius:50%; margin-right:10px; object-fit:cover;">
                         <div>
                             <div class="bn" style="font-weight:600; font-size:0.9rem;">${u.name.split(' ')[0]}</div>
                         </div>
@@ -875,26 +903,28 @@
 
         async function loadHistory() {
             const list = document.getElementById('historyList');
-            const snap = await db.collection('withdrawals').where('uid', '==', currentUser).orderBy('date', 'desc').limit(10).get();
-            let html = '';
-            if(snap.empty) html = '<p class="bn" style="text-align:center; color:#666;">কোনো তথ্য নেই</p>';
-            
-            snap.forEach(d => {
-                const data = d.data();
-                const color = data.status === 'paid' ? 'var(--success)' : '#FFA500';
-                html += `
-                <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #333;">
-                    <div>
-                        <div style="font-weight:bold;">${data.method}</div>
-                        <small style="color:#666;">${data.source.toUpperCase()}</small>
-                    </div>
-                    <div style="text-align:right;">
-                        <div>৳ ${data.amount}</div>
-                        <small style="color:${color}; text-transform:uppercase;">${data.status}</small>
-                    </div>
-                </div>`;
-            });
-            list.innerHTML = html;
+            try {
+                const snap = await db.collection('withdrawals').where('uid', '==', currentUser).orderBy('date', 'desc').limit(10).get();
+                let html = '';
+                if(snap.empty) html = '<p class="bn" style="text-align:center; color:#666;">কোনো তথ্য নেই</p>';
+                
+                snap.forEach(d => {
+                    const data = d.data();
+                    const color = data.status === 'paid' ? 'var(--success)' : '#FFA500';
+                    html += `
+                    <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #333;">
+                        <div>
+                            <div style="font-weight:bold;">${data.method}</div>
+                            <small style="color:#666;">${data.source.toUpperCase()}</small>
+                        </div>
+                        <div style="text-align:right;">
+                            <div>৳ ${data.amount}</div>
+                            <small style="color:${color}; text-transform:uppercase;">${data.status}</small>
+                        </div>
+                    </div>`;
+                });
+                list.innerHTML = html;
+            } catch(e) { console.log(e); list.innerHTML = "History Error"; }
         }
 
         // --- UTILS ---
@@ -920,7 +950,11 @@
             if(confirm("লগআউট করবেন?")) location.reload();
         }
 
-        // Start App
+        // Start App with global error handler
+        window.onerror = function(msg, url, line) {
+           // alert("Global Error: " + msg); // Optional: Uncomment for debugging
+        };
+        
         window.onload = init;
 
     </script>
