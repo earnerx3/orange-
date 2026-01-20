@@ -34,7 +34,6 @@
             
             /* --- GRADIENTS --- */
             --grad-gold: linear-gradient(135deg, #FFD60A, #FF9F0A);
-            --grad-dark: linear-gradient(145deg, #1a1a1a, #0a0a0a);
             --glass-bg: rgba(20, 20, 20, 0.75);
             --glass-border: 1px solid rgba(255, 255, 255, 0.08);
             
@@ -54,17 +53,28 @@
             flex-direction: column;
         }
 
-        /* --- BACKGROUND FX --- */
+        /* --- LAVA BACKGROUND FX --- */
         .bg-fx {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: 
-                radial-gradient(circle at 15% 50%, rgba(255, 159, 10, 0.08), transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(255, 214, 10, 0.05), transparent 25%);
+            background: #050505;
             overflow: hidden;
         }
-        .bg-fx::before {
-            content: ''; position: absolute; width: 100%; height: 100%;
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zzM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: lavaMove 20s infinite alternate;
+        }
+        .blob:nth-child(1) { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #FF9F0A; animation-delay: 0s; }
+        .blob:nth-child(2) { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: #6a00ff; animation-delay: -5s; }
+        .blob:nth-child(3) { top: 40%; left: 40%; width: 40vw; height: 40vw; background: #ff0055; animation-delay: -10s; }
+
+        @keyframes lavaMove {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0, 0) scale(1); }
         }
 
         /* --- UTILS --- */
@@ -180,21 +190,15 @@
             display: flex; flex-direction: column; align-items: center;
         }
 
-        /* --- PREMIUM AD ZONE (Colorful Rotating Border) --- */
+        /* --- PREMIUM AD ZONE --- */
         .ad-zone-wrap {
             position: relative; padding: 3px; border-radius: 24px; margin-bottom: 25px;
             overflow: hidden; box-shadow: 0 0 30px rgba(0,0,0,0.5);
         }
-        /* Slow rotating colorful lights */
         .ad-zone-wrap::before {
             content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
             background: conic-gradient(transparent 0deg, #ff0000 90deg, transparent 180deg, #00aaff 270deg, transparent 360deg);
             animation: slowSpin 8s linear infinite;
-        }
-        .ad-zone-wrap::after {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: conic-gradient(transparent 45deg, #ffbb00 135deg, transparent 225deg, #00ff00 315deg, transparent 360deg);
-            animation: slowSpin 8s linear infinite reverse;
         }
         .ad-zone {
             position: relative; background: #121212; border-radius: 22px; padding: 20px;
@@ -207,7 +211,8 @@
             display: flex; align-items: center; gap: 15px; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s;
         }
         .task-card:active { transform: scale(0.98); background: #202020; }
-        .task-icon { width: 45px; height: 45px; border-radius: 10px; background: #222; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--primary); }
+        .task-icon { width: 45px; height: 45px; border-radius: 10px; background: #222; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--primary); overflow: hidden; }
+        .task-icon img { width: 100%; height: 100%; object-fit: cover; }
         .task-btn {
             margin-left: auto; padding: 8px 16px; border-radius: 8px; font-size: 0.8rem; font-weight: bold;
             border: none; cursor: pointer; min-width: 80px;
@@ -216,7 +221,7 @@
         .btn-check { background: var(--accent-blue); color: #fff; }
         .btn-claim { background: var(--success); color: #fff; animation: pulseBtn 1s infinite; }
 
-        /* --- WALLET --- */
+        /* --- WALLET & PAYMENT METHODS --- */
         .wallet-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
         .w-card {
             padding: 20px; border-radius: 18px; border: 1px solid #333; background: #161616;
@@ -233,6 +238,57 @@
             font-size: 1rem; opacity: 0; transform: scale(0); transition: 0.3s;
         }
         .w-card.selected .check-mark { opacity: 1; transform: scale(1); }
+
+        /* Payment Method Buttons */
+        .pay-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .pay-method {
+            background: #222; padding: 12px 5px; text-align: center; border-radius: 12px;
+            border: 1px solid #333; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative; overflow: hidden; font-size: 0.85rem; color: #aaa;
+        }
+        .pay-method:hover { background: #2a2a2a; }
+        .pay-method.selected {
+            background: linear-gradient(135deg, rgba(255, 159, 10, 0.2), rgba(255, 159, 10, 0.05));
+            border-color: var(--primary);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 159, 10, 0.3);
+            transform: translateY(-2px);
+        }
+        .pay-method.selected::after {
+            content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+            position: absolute; top: 2px; right: 5px; font-size: 0.6rem; color: var(--primary);
+        }
+
+        /* --- RANK & LIKES --- */
+        .rank-list { padding-bottom: 70px; } 
+        .rank-row {
+            display: flex; align-items: center; padding: 12px; margin-bottom: 8px;
+            background: #151515; border-radius: 12px; border: 1px solid #222;
+        }
+        .rank-num { font-weight: 800; font-size: 1.1rem; width: 35px; color: #555; font-style: italic; }
+        .rank-row:nth-child(1) .rank-num { color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+        .rank-row:nth-child(2) .rank-num { color: #C0C0C0; }
+        .rank-row:nth-child(3) .rank-num { color: #CD7F32; }
+
+        /* Like Button Animation */
+        .like-btn {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            width: 45px; height: 45px; border-radius: 10px; cursor: pointer; transition: 0.2s;
+            margin-left: 8px;
+        }
+        .like-btn i { color: #666; font-size: 1rem; transition: 0.2s; }
+        .like-btn span { font-size: 0.6rem; color: #666; margin-top: 2px; }
+        
+        .like-btn.liked { background: rgba(255, 69, 58, 0.15); border-color: rgba(255, 69, 58, 0.3); }
+        .like-btn.liked i { color: #FF453A; animation: popHeart 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .like-btn.liked span { color: #FF453A; }
+
+        @keyframes popHeart {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.5); }
+            100% { transform: scale(1); }
+        }
 
         /* --- BOTTOM SHEET --- */
         .bottom-sheet {
@@ -257,23 +313,22 @@
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 999; opacity: 0; pointer-events: none; transition: 0.3s; }
         .overlay.active { opacity: 1; pointer-events: all; }
 
-        /* --- RANK --- */
-        .rank-list { padding-bottom: 70px; } 
-        .rank-row {
-            display: flex; align-items: center; padding: 12px; margin-bottom: 8px;
-            background: #151515; border-radius: 12px; border: 1px solid #222;
+        /* --- AD OVERLAY --- */
+        #ad-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 10000; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
         }
-        .rank-num { font-weight: 800; font-size: 1.1rem; width: 35px; color: #555; font-style: italic; }
-        .rank-row:nth-child(1) .rank-num { color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
-        .rank-row:nth-child(2) .rank-num { color: #C0C0C0; }
-        .rank-row:nth-child(3) .rank-num { color: #CD7F32; }
-        .sticky-rank {
-            position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 450px; background: rgba(30,30,30,0.95);
-            backdrop-filter: blur(10px); border: 1px solid var(--primary);
-            padding: 10px 15px; border-radius: 15px; display: flex; align-items: center;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5); z-index: 50;
+        #ad-overlay.active { opacity: 1; pointer-events: all; }
+        .ad-timer-circle {
+            width: 100px; height: 100px; border-radius: 50%;
+            border: 5px solid #222; border-top-color: var(--primary);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 2rem; font-weight: bold; color: #fff;
+            margin-bottom: 20px; animation: spin 1s linear infinite;
         }
+        .no-anim { animation: none !important; border-color: var(--primary); }
 
         /* --- NAV BAR --- */
         .nav-bar { 
@@ -292,7 +347,10 @@
             box-shadow: 0 0 10px var(--primary);
         }
 
-        /* --- KEYFRAMES --- */
+        /* --- TOAST --- */
+        #toast-box { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 11000; width: 90%; max-width: 350px; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(10px); color: #fff; padding: 12px 20px; border-radius: 12px; display: flex; align-items: center; gap: 10px; border-left: 4px solid var(--primary); box-shadow: 0 5px 20px rgba(0,0,0,0.5); animation: fadeUp 0.3s forwards; }
+
         @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
         @keyframes rgbFlow { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
@@ -300,10 +358,6 @@
         @keyframes slowSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes pulseBtn { 0% { box-shadow: 0 0 0 0 rgba(50, 215, 75, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(50, 215, 75, 0); } 100% { box-shadow: 0 0 0 0 rgba(50, 215, 75, 0); } }
-
-        /* --- TOAST --- */
-        #toast-box { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 5000; width: 90%; max-width: 350px; display: flex; flex-direction: column; gap: 10px; }
-        .toast { background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(10px); color: #fff; padding: 12px 20px; border-radius: 12px; display: flex; align-items: center; gap: 10px; border-left: 4px solid var(--primary); box-shadow: 0 5px 20px rgba(0,0,0,0.5); animation: fadeUp 0.3s forwards; }
 
     </style>
 </head>
@@ -321,9 +375,17 @@
         <p class="loading-text">PREPARING EXPERIENCE</p>
     </div>
 
-    <!-- SKELETON LAYER (Shown before real content) -->
+    <!-- AD WATCH OVERLAY -->
+    <div id="ad-overlay">
+        <div class="ad-timer-circle" id="adTimerCircle">
+            <span id="adTimerText">15</span>
+        </div>
+        <h3 style="margin-bottom: 10px; color: var(--primary);">WATCHING AD</h3>
+        <p style="color: #888; font-size: 0.9rem;">Don't minimize the app!<br>Reward in <span id="adTimerSmall">15</span>s</p>
+    </div>
+
+    <!-- SKELETON LAYER -->
     <div id="skeleton-layer" class="skeleton-box">
-        <!-- Header Skeleton -->
         <div class="sk-header">
             <div style="display:flex; align-items:center; gap:10px;">
                 <div class="skeleton sk-circle"></div>
@@ -334,11 +396,8 @@
             </div>
             <div class="skeleton sk-line" style="width: 60px; height: 30px; border-radius: 10px;"></div>
         </div>
-        <!-- Balance Card Skeleton -->
         <div class="skeleton sk-card-lg"></div>
-        <!-- Button Row Skeleton -->
         <div class="skeleton sk-card-sm"></div>
-        <!-- Grid Skeleton -->
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
             <div class="skeleton sk-card-sm"></div>
             <div class="skeleton sk-card-sm"></div>
@@ -348,8 +407,12 @@
     <!-- TOASTS -->
     <div id="toast-box"></div>
 
-    <!-- BACKGROUND -->
-    <div class="bg-fx"></div>
+    <!-- BACKGROUND WITH LAVA EFFECT -->
+    <div class="bg-fx">
+        <div class="blob"></div>
+        <div class="blob"></div>
+        <div class="blob"></div>
+    </div>
 
     <!-- APP CONTENT -->
     <div id="app-content">
@@ -428,7 +491,7 @@
                     </div>
                     <i class="fas fa-film" style="font-size: 3rem; color: #eee; margin-bottom: 15px; text-shadow: 0 0 15px rgba(255,255,255,0.3);"></i>
                     <h3 style="margin-bottom: 5px;">Premium Video</h3>
-                    <p style="color: #888; font-size: 0.8rem; margin-bottom: 15px;">Watch full video to get reward.</p>
+                    <p style="color: #888; font-size: 0.8rem; margin-bottom: 15px;">Watch full video (15s) to get reward.</p>
                     <button class="btn-main" id="adBtn" onclick="watchAd()">
                         <i class="fas fa-play"></i> Watch Now (+৳2.00)
                     </button>
@@ -437,25 +500,18 @@
 
             <h3 style="margin-bottom: 15px; font-size: 1.1rem;">Active Tasks</h3>
             <div id="taskList">
-                <!-- JS Will Inject Tasks Here -->
+                <!-- JS Will Inject Tasks (Admin Controlled) -->
+                <p style="text-align: center; color: #666; padding: 20px;">Loading Tasks...</p>
             </div>
         </div>
 
         <!-- LEADERBOARD PAGE -->
         <div id="leaderboard" class="page">
             <h2 style="text-align: center; margin-bottom: 10px;">Hall of Fame 🏆</h2>
-            <p style="text-align: center; color: #666; font-size: 0.85rem; margin-bottom: 25px;">Top referrers this month</p>
+            <p style="text-align: center; color: #666; font-size: 0.85rem; margin-bottom: 25px;">Top referrers & Most Liked</p>
 
             <div id="lbList" class="rank-list">
-                <!-- JS Injects Ranks -->
-            </div>
-
-            <!-- Sticky User Rank -->
-            <div class="sticky-rank" id="myRankBar" style="display: none;">
-                <span id="myRankNum" style="font-weight: bold; margin-right: 15px; width: 25px;">#0</span>
-                <img src="" id="myRankAv" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px;">
-                <span style="font-size: 0.9rem;">You</span>
-                <span style="margin-left: auto; font-weight: bold; color: var(--primary);" id="myRankCount">0 Refs</span>
+                <!-- JS Injects Ranks with Like Button -->
             </div>
         </div>
 
@@ -493,10 +549,11 @@
 
                 <input type="number" id="wAmount" placeholder="Amount (৳)" style="width: 100%; padding: 15px; background: #000; border: 1px solid #333; color: white; border-radius: 12px; margin-bottom: 15px; outline: none; font-family: 'Sora';">
                 
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-                    <div style="background: #222; padding: 10px; text-align: center; border-radius: 10px; border: 1px solid #333; cursor: pointer;" onclick="document.getElementById('wMethod').value='bkash'; triggerHaptic()">Bkash</div>
-                    <div style="background: #222; padding: 10px; text-align: center; border-radius: 10px; border: 1px solid #333; cursor: pointer;" onclick="document.getElementById('wMethod').value='nagad'; triggerHaptic()">Nagad</div>
-                    <div style="background: #222; padding: 10px; text-align: center; border-radius: 10px; border: 1px solid #333; cursor: pointer;" onclick="document.getElementById('wMethod').value='rocket'; triggerHaptic()">Rocket</div>
+                <!-- UPDATED PAYMENT SELECTOR -->
+                <div class="pay-grid">
+                    <div class="pay-method selected" onclick="selectPayMethod(this, 'bkash')">Bkash</div>
+                    <div class="pay-method" onclick="selectPayMethod(this, 'nagad')">Nagad</div>
+                    <div class="pay-method" onclick="selectPayMethod(this, 'rocket')">Rocket</div>
                 </div>
                 <input type="hidden" id="wMethod" value="bkash">
 
@@ -525,15 +582,9 @@
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div class="glass" style="padding: 20px; text-align: center; cursor: pointer;" onclick="window.open('https://t.me/Orange_lemon1_Bot'); triggerHaptic()">
-                    <i class="fab fa-telegram" style="font-size: 2rem; color: #0088cc; margin-bottom: 10px;"></i>
-                    <div style="font-size: 0.9rem;">Support Group</div>
-                </div>
-                <div class="glass" style="padding: 20px; text-align: center; cursor: pointer;" onclick="triggerHaptic()">
-                    <i class="fas fa-question-circle" style="font-size: 2rem; color: #888; margin-bottom: 10px;"></i>
-                    <div style="font-size: 0.9rem;">Help Center</div>
-                </div>
+            <div style="margin-bottom: 10px; color: #888; font-size: 0.9rem;">Join Channels:</div>
+            <div id="supportList" style="display: flex; flex-direction: column; gap: 10px;">
+                <!-- JS Injects Support Channels from Admin Panel -->
             </div>
         </div>
 
@@ -578,6 +629,11 @@
             withdraw: { taskMin: 50, refMin: 100 }
         };
 
+        let adminConfig = {
+            monetagId: "", // Fetched from DB
+            supportLinks: []
+        };
+
         // --- INIT ---
         let db, auth, userRef, currentUser;
         let userData = {};
@@ -591,31 +647,57 @@
             firebase.initializeApp(CONFIG.firebase);
             db = firebase.firestore();
             auth = firebase.auth();
+            db.enablePersistence().catch(err => console.log(err));
         } catch(e) { console.error("Firebase Error", e); }
 
         window.onload = async () => {
             const bar = document.getElementById('loadBar');
-            bar.style.width = '70%'; // Fake load
+            bar.style.width = '60%'; 
             
             setTimeout(async () => {
+                await loadAdminConfig(); // Fetch Admin Config first
+                bar.style.width = '80%';
                 await initApp();
                 bar.style.width = '100%';
                 
                 setTimeout(() => {
-                    // Hide Loader
                     document.getElementById('loader').style.opacity = '0';
                     setTimeout(() => document.getElementById('loader').remove(), 500);
-
-                    // Fade out Skeleton after delay
                     setTimeout(() => {
                         document.getElementById('skeleton-layer').style.opacity = '0';
                         setTimeout(() => document.getElementById('skeleton-layer').remove(), 500);
                         document.getElementById('app-content').classList.add('visible');
                     }, 800);
-
                 }, 500);
             }, 1000);
         };
+
+        // --- FETCH ADMIN CONFIG & INJECT AD SCRIPT ---
+        async function loadAdminConfig() {
+            try {
+                const doc = await db.collection('settings').doc('appConfig').get();
+                if(doc.exists) {
+                    const data = doc.data();
+                    adminConfig.monetagId = data.monetagId || "";
+                    adminConfig.supportLinks = data.supportLinks || [];
+                    
+                    // Inject Monetag Script if ID exists
+                    if(adminConfig.monetagId) {
+                        const script = document.createElement('script');
+                        script.src = "//libtl.com/sdk.js";
+                        script.setAttribute('data-zone', adminConfig.monetagId);
+                        script.setAttribute('data-sdk', `show_${adminConfig.monetagId}`);
+                        document.body.appendChild(script);
+                    }
+                } else {
+                    adminConfig.supportLinks = [
+                        { title: "Support Group", url: "https://t.me/Orange_lemon1_Bot", icon: "fab fa-telegram" }
+                    ];
+                }
+            } catch(e) {
+                console.log("Config Load Error", e);
+            }
+        }
 
         async function initApp() {
             try {
@@ -629,7 +711,7 @@
                 } else {
                     const cred = await auth.signInAnonymously();
                     uid = cred.user.uid;
-                    name = "Dev User";
+                    name = "User " + uid.substr(0,4);
                     photo = "https://ui-avatars.com/api/?background=random&name=D";
                 }
                 
@@ -641,33 +723,44 @@
                     const newUser = {
                         uid, name, photo: photo || `https://ui-avatars.com/api/?background=random&name=${name}`,
                         taskBalance: 0, referralBalance: 0, referralCount: 0,
-                        tasksDone: 0, adsWatched: 0, adDate: new Date().toDateString(),
+                        tasksDone: 0, adsWatched: 0, likes: 0, 
+                        adDate: new Date().toDateString(),
                         joinedAt: firebase.firestore.FieldValue.serverTimestamp()
                     };
                     
                     if(startParam && startParam.startsWith('ref_')) {
                         const refId = startParam.replace('ref_', '');
-                        if(refId !== uid) {
-                            newUser.referredBy = refId;
-                            db.collection('users').doc(refId).update({
-                                referralCount: firebase.firestore.FieldValue.increment(1),
-                                referralBalance: firebase.firestore.FieldValue.increment(5.00)
-                            });
+                        if(refId !== uid) { 
+                            const refUserSnap = await db.collection('users').doc(refId).get();
+                            if(refUserSnap.exists) {
+                                newUser.referredBy = refId;
+                                db.collection('users').doc(refId).update({
+                                    referralCount: firebase.firestore.FieldValue.increment(1),
+                                    referralBalance: firebase.firestore.FieldValue.increment(5.00)
+                                });
+                            }
                         }
                     }
                     await userRef.set(newUser);
                     userData = newUser;
                 } else {
                     userData = snap.data();
-                    if(userData.name !== name || (photo && userData.photo !== photo)) {
-                        userRef.update({ name, photo });
-                    }
+                    if(name && userData.name !== name) userRef.update({ name });
+                    if(photo && userData.photo !== photo) userRef.update({ photo });
+                    
                     const today = new Date().toDateString();
                     if(userData.adDate !== today) {
                         userRef.update({ adsWatched: 0, adDate: today });
                         userData.adsWatched = 0;
                     }
                 }
+
+                userRef.onSnapshot((doc) => {
+                    if(doc.exists) {
+                        userData = doc.data();
+                        updateUIBalances();
+                    }
+                });
 
                 renderAll();
             } catch(e) {
@@ -682,20 +775,28 @@
             document.getElementById('headAvatar').src = userData.photo;
             document.getElementById('headLvl').innerText = getLevel(userData.referralCount);
             
-            const total = (userData.taskBalance + userData.referralBalance).toFixed(2);
-            document.getElementById('headBal').innerText = total;
-            document.getElementById('mainBal').innerText = total;
+            updateUIBalances();
+            
             document.getElementById('statRef').innerText = userData.referralCount || 0;
             document.getElementById('statTask').innerText = (userData.adsWatched || 0) + (userData.tasksDone || 0);
             document.getElementById('adCount').innerText = userData.adsWatched || 0;
-            document.getElementById('wTaskBal').innerText = userData.taskBalance.toFixed(2);
-            document.getElementById('wRefBal').innerText = userData.referralBalance.toFixed(2);
+            
             document.getElementById('profName').innerText = userData.name;
             document.getElementById('profAv').src = userData.photo;
             document.getElementById('profUid').innerText = userData.uid;
             document.getElementById('profLvl').innerText = getLevel(userData.referralCount);
             document.getElementById('profAv').style.borderColor = getLevelColor(userData.referralCount);
-            loadTasks();
+            
+            loadDynamicTasks();
+            renderSupportChannels();
+        }
+
+        function updateUIBalances() {
+            const total = ((userData.taskBalance || 0) + (userData.referralBalance || 0)).toFixed(2);
+            document.getElementById('headBal').innerText = total;
+            document.getElementById('mainBal').innerText = total;
+            document.getElementById('wTaskBal').innerText = (userData.taskBalance || 0).toFixed(2);
+            document.getElementById('wRefBal').innerText = (userData.referralBalance || 0).toFixed(2);
         }
 
         function getLevel(refs) {
@@ -713,23 +814,14 @@
             return '#FF9F0A';
         }
 
-        // --- HAPTIC & CONFETTI ---
+        // --- HAPTIC & ANIMATION ---
         function triggerHaptic() {
             if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
         }
 
         function triggerSuccess() {
             if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-            const count = 200;
-            const defaults = { origin: { y: 0.7 } };
-            function fire(particleRatio, opts) {
-                confetti(Object.assign({}, defaults, opts, { particleCount: Math.floor(count * particleRatio) }));
-            }
-            fire(0.25, { spread: 26, startVelocity: 55 });
-            fire(0.2, { spread: 60 });
-            fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
-            fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
-            fire(0.1, { spread: 120, startVelocity: 45 });
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
         }
 
         // --- NAVIGATION ---
@@ -744,131 +836,235 @@
             if(pageId === 'leaderboard') loadLeaderboard();
         }
 
-        // --- TASKS ---
-        const mockTasks = [
-            { id: 't1', title: 'Join Telegram Channel', reward: 1.00, url: 'https://t.me/telegram', icon: 'fab fa-telegram', type: 'social' },
-            { id: 't2', title: 'Follow on Twitter', reward: 1.50, url: 'https://twitter.com', icon: 'fab fa-twitter', type: 'social' },
-            { id: 't3', title: 'Visit Website (30s)', reward: 0.50, url: 'https://google.com', icon: 'fas fa-globe', type: 'web' }
-        ];
+        // --- AD SYSTEM & LOGIC (Modified) ---
+        
+        // Helper: Run Ad Process with 15s Timer & Anti-Cheat
+        function runAdProcess(onSuccessCallback) {
+            // Check if Monetag ID is loaded
+            if(!adminConfig.monetagId || typeof window[`show_${adminConfig.monetagId}`] === 'undefined') {
+                return showToast("Ad server unavailable. Try later.", "error");
+            }
 
-        function loadTasks() {
-            const list = document.getElementById('taskList');
-            list.innerHTML = '';
-            const doneTasks = JSON.parse(localStorage.getItem('doneTasks') || '[]');
+            const overlay = document.getElementById('ad-overlay');
+            const timerText = document.getElementById('adTimerText');
+            const timerSmall = document.getElementById('adTimerSmall');
+            const circle = document.getElementById('adTimerCircle');
+            
+            // Trigger Ad (Monetag)
+            try {
+                window[`show_${adminConfig.monetagId}`]().catch(e => console.log("Ad Blocked/Fail", e));
+            } catch(e) { console.log(e); }
 
-            mockTasks.forEach(t => {
-                if(doneTasks.includes(t.id)) return;
-                const div = document.createElement('div');
-                div.className = 'task-card';
-                div.innerHTML = `
-                    <div class="task-icon"><i class="${t.icon}"></i></div>
-                    <div style="flex:1;">
-                        <div style="font-weight:600; font-size: 0.9rem;">${t.title}</div>
-                        <div style="color:var(--success); font-size:0.8rem;">+৳${t.reward.toFixed(2)}</div>
-                    </div>
-                    <button class="task-btn btn-start" id="btn-${t.id}" onclick="handleTask('${t.id}', '${t.url}', ${t.reward})">Start</button>
-                `;
-                list.appendChild(div);
-            });
-            if(list.children.length === 0) list.innerHTML = '<p style="text-align:center;color:#666;">No tasks available</p>';
+            // Reset UI
+            let timeLeft = 15;
+            let failed = false;
+            overlay.classList.add('active');
+            circle.classList.remove('no-anim');
+            timerText.innerText = timeLeft;
+            timerSmall.innerText = timeLeft;
+
+            // Visibility Listener (Anti-Cheat)
+            const visibilityHandler = () => {
+                if(document.hidden) {
+                    failed = true;
+                }
+            };
+            document.addEventListener('visibilitychange', visibilityHandler);
+
+            // Timer Loop
+            const timer = setInterval(() => {
+                // If failed (tab switched)
+                if(failed) {
+                    clearInterval(timer);
+                    document.removeEventListener('visibilitychange', visibilityHandler);
+                    overlay.classList.remove('active');
+                    showToast("Task Failed: You left the app!", "error");
+                    return;
+                }
+
+                timeLeft--;
+                timerText.innerText = timeLeft;
+                timerSmall.innerText = timeLeft;
+
+                if(timeLeft <= 0) {
+                    clearInterval(timer);
+                    document.removeEventListener('visibilitychange', visibilityHandler);
+                    
+                    // Success State
+                    circle.classList.add('no-anim');
+                    timerText.innerHTML = '<i class="fas fa-check"></i>';
+                    
+                    setTimeout(() => {
+                        overlay.classList.remove('active');
+                        onSuccessCallback(); // Execute the reward/verify action
+                    }, 1000);
+                }
+            }, 1000);
         }
 
+        // Main Watch Ad Function (Daily Ad Limit)
+        async function watchAd() {
+            triggerHaptic();
+            if((userData.adsWatched || 0) >= CONFIG.adLimit) return showToast("Daily Limit Reached", "error");
+            
+            runAdProcess(() => {
+                // Reward Logic
+                userRef.update({
+                    taskBalance: firebase.firestore.FieldValue.increment(CONFIG.adReward),
+                    adsWatched: firebase.firestore.FieldValue.increment(1)
+                });
+                triggerSuccess();
+                showToast("Video Reward Added!", "success");
+            });
+        }
+
+        // --- DYNAMIC TASKS (Ad integrated) ---
+        async function loadDynamicTasks() {
+            const list = document.getElementById('taskList');
+            list.innerHTML = '<div style="text-align:center;"><i class="fas fa-spinner fa-spin"></i></div>';
+            
+            try {
+                const snap = await db.collection('tasks').where('active', '==', true).get();
+                const doneTasks = JSON.parse(localStorage.getItem('doneTasks') || '[]');
+                
+                list.innerHTML = '';
+                
+                if(snap.empty) {
+                    list.innerHTML = '<p style="text-align:center;color:#666;">No active tasks</p>';
+                    return;
+                }
+
+                snap.forEach(doc => {
+                    const t = doc.data();
+                    const id = doc.id;
+                    if(doneTasks.includes(id)) return;
+
+                    const div = document.createElement('div');
+                    div.className = 'task-card';
+                    const iconHtml = t.icon.startsWith('http') 
+                        ? `<img src="${t.icon}">` 
+                        : `<i class="${t.icon}"></i>`;
+
+                    div.innerHTML = `
+                        <div class="task-icon">${iconHtml}</div>
+                        <div style="flex:1;">
+                            <div style="font-weight:600; font-size: 0.9rem;">${t.title}</div>
+                            <div style="color:var(--success); font-size:0.8rem;">+৳${parseFloat(t.reward).toFixed(2)}</div>
+                        </div>
+                        <button class="task-btn btn-start" id="btn-${id}" onclick="handleTask('${id}', '${t.url}', ${t.reward})">Start</button>
+                    `;
+                    list.appendChild(div);
+                });
+            } catch(e) {
+                console.error("Task load error", e);
+                list.innerHTML = '<p style="text-align:center;color:red;">Failed to load tasks</p>';
+            }
+        }
+
+        // Modified handleTask (Ad before Claim)
         function handleTask(id, url, reward) {
             triggerHaptic();
             const btn = document.getElementById(`btn-${id}`);
+            
             if(btn.classList.contains('btn-start')) {
+                // Step 1: Open Link
                 window.open(url, '_blank');
                 btn.classList.remove('btn-start');
                 btn.classList.add('btn-check');
                 btn.innerText = 'Check';
-            } else if(btn.classList.contains('btn-check')) {
-                btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
-                setTimeout(() => {
+            } 
+            else if(btn.classList.contains('btn-check')) {
+                // Step 2: Run Ad Process (15s Verification)
+                runAdProcess(() => {
+                    // If Ad Success -> Enable Claim
                     btn.classList.remove('btn-check');
                     btn.classList.add('btn-claim');
                     btn.innerText = 'Claim';
-                }, 2000);
-            } else if(btn.classList.contains('btn-claim')) {
+                    showToast("Verified! Click Claim.", "success");
+                });
+            } 
+            else if(btn.classList.contains('btn-claim')) {
+                // Step 3: Give Reward
                 userRef.update({
-                    taskBalance: firebase.firestore.FieldValue.increment(reward),
+                    taskBalance: firebase.firestore.FieldValue.increment(parseFloat(reward)),
                     tasksDone: firebase.firestore.FieldValue.increment(1)
                 });
-                userData.taskBalance += reward;
+                
                 const done = JSON.parse(localStorage.getItem('doneTasks') || '[]');
                 done.push(id);
                 localStorage.setItem('doneTasks', JSON.stringify(done));
                 
-                renderAll();
                 triggerSuccess();
                 showToast(`Rewarded +৳${reward}`, "success");
                 btn.parentElement.remove();
             }
         }
 
-        // --- ADS ---
-        async function watchAd() {
-            triggerHaptic();
-            if((userData.adsWatched || 0) >= CONFIG.adLimit) return showToast("Daily Limit Reached", "error");
-            
-            const btn = document.getElementById('adBtn');
-            btn.disabled = true;
-            btn.innerHTML = 'Watching...';
-
-            setTimeout(() => {
-                userRef.update({
-                    taskBalance: firebase.firestore.FieldValue.increment(CONFIG.adReward),
-                    adsWatched: firebase.firestore.FieldValue.increment(1)
-                });
-                userData.taskBalance += CONFIG.adReward;
-                userData.adsWatched = (userData.adsWatched || 0) + 1;
-                
-                renderAll();
-                triggerSuccess();
-                showToast("Ad Reward Added!", "success");
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-play"></i> Watch Now';
-            }, 3000);
-        }
-
-        // --- LEADERBOARD ---
+        // --- LEADERBOARD & LIKES ---
         async function loadLeaderboard() {
             const list = document.getElementById('lbList');
-            const myRankBar = document.getElementById('myRankBar');
-            const cache = localStorage.getItem('lb_cache');
-            if(cache) renderLBList(JSON.parse(cache), list);
+            list.innerHTML = '<div style="text-align:center; padding:20px;"><div class="spinner-ring" style="width:20px;height:20px;border:2px solid orange;border-radius:50%;"></div></div>';
 
-            const snap = await db.collection('users').orderBy('referralCount', 'desc').limit(20).get();
-            let users = [];
-            snap.forEach(d => users.push(d.data()));
-            localStorage.setItem('lb_cache', JSON.stringify(users));
-            renderLBList(users, list);
-
-            const myIndex = users.findIndex(u => u.uid === currentUser);
-            if(myIndex > -1) {
-                myRankBar.style.display = 'flex';
-                document.getElementById('myRankNum').innerText = `#${myIndex + 1}`;
-                document.getElementById('myRankAv').src = userData.photo;
-                document.getElementById('myRankCount').innerText = `${userData.referralCount} Refs`;
+            try {
+                const snap = await db.collection('users').orderBy('referralCount', 'desc').limit(20).get();
+                let html = '';
+                
+                snap.forEach((doc, i) => {
+                    const u = doc.data();
+                    const isMe = u.uid === currentUser;
+                    const likedByMe = localStorage.getItem(`liked_${u.uid}`) === 'true';
+                    
+                    html += `
+                    <div class="rank-row">
+                        <div class="rank-num">#${i + 1}</div>
+                        <img src="${u.photo}" style="width:35px; height:35px; border-radius:50%; margin-right:10px; object-fit:cover;">
+                        <div style="flex:1;">
+                            <div style="font-weight:600; font-size:0.9rem;">${u.name.split(' ')[0]} ${isMe ? '(You)' : ''}</div>
+                            <div style="font-size:0.7rem; color:#666;">${u.referralCount} Refs</div>
+                        </div>
+                        <div class="like-btn ${likedByMe ? 'liked' : ''}" onclick="toggleLike('${u.uid}', this)">
+                            <i class="${likedByMe ? 'fas' : 'far'} fa-heart"></i>
+                            <span id="like-count-${u.uid}">${u.likes || 0}</span>
+                        </div>
+                    </div>`;
+                });
+                list.innerHTML = html;
+            } catch(e) {
+                console.error(e);
             }
         }
 
-        function renderLBList(users, list) {
-            let html = '';
-            users.forEach((u, i) => {
-                html += `
-                <div class="rank-row">
-                    <div class="rank-num">#${i + 1}</div>
-                    <img src="${u.photo}" style="width:35px; height:35px; border-radius:50%; margin-right:10px; object-fit:cover;">
-                    <div style="flex:1;">
-                        <div style="font-weight:600; font-size:0.9rem;">${u.name.split(' ')[0]}</div>
-                        <div style="font-size:0.7rem; color:#666;">${u.referralCount} Referrals</div>
-                    </div>
-                </div>`;
+        function toggleLike(targetUid, btn) {
+            triggerHaptic();
+            if(targetUid === currentUser) return showToast("Can't like yourself!", "error");
+            
+            const storageKey = `liked_${targetUid}`;
+            const isLiked = localStorage.getItem(storageKey) === 'true';
+
+            if(isLiked) return showToast("Already Liked!", "error");
+
+            btn.classList.add('liked');
+            btn.querySelector('i').classList.remove('far');
+            btn.querySelector('i').classList.add('fas');
+            
+            const countSpan = document.getElementById(`like-count-${targetUid}`);
+            countSpan.innerText = parseInt(countSpan.innerText) + 1;
+
+            db.collection('users').doc(targetUid).update({
+                likes: firebase.firestore.FieldValue.increment(1)
             });
-            list.innerHTML = html;
+
+            localStorage.setItem(storageKey, 'true');
         }
 
-        // --- WITHDRAW ---
+        // --- WITHDRAW & PAYMENT UI ---
+        function selectPayMethod(el, method) {
+            triggerHaptic();
+            document.querySelectorAll('.pay-method').forEach(i => i.classList.remove('selected'));
+            el.classList.add('selected');
+            document.getElementById('wMethod').value = method;
+        }
+
         function selectWallet(type) {
             triggerHaptic();
             selectedWallet = type;
@@ -889,9 +1085,15 @@
             const method = document.getElementById('wMethod').value;
             
             if(!amount || !number) return showToast("Please fill all fields", "error");
+            if(amount <= 0) return showToast("Invalid Amount", "error");
+
             const min = selectedWallet === 'task' ? CONFIG.withdraw.taskMin : CONFIG.withdraw.refMin;
             if(amount < min) return showToast(`Minimum withdraw is ৳${min}`, "error");
-            const currentBal = selectedWallet === 'task' ? userData.taskBalance : userData.referralBalance;
+
+            const userSnap = await userRef.get();
+            const serverData = userSnap.data();
+            const currentBal = selectedWallet === 'task' ? serverData.taskBalance : serverData.referralBalance;
+
             if(amount > currentBal) return showToast("Insufficient Balance", "error");
 
             const btn = document.querySelector('#wallet .btn-main');
@@ -905,16 +1107,14 @@
                     uid: currentUser, amount, method, number, source: selectedWallet,
                     status: 'pending', date: firebase.firestore.FieldValue.serverTimestamp()
                 });
+                
                 const updateData = selectedWallet === 'task' 
                     ? { taskBalance: firebase.firestore.FieldValue.increment(-amount) }
                     : { referralBalance: firebase.firestore.FieldValue.increment(-amount) };
+                
                 batch.update(userRef, updateData);
                 await batch.commit();
-
-                if(selectedWallet === 'task') userData.taskBalance -= amount;
-                else userData.referralBalance -= amount;
                 
-                renderAll();
                 triggerSuccess();
                 showToast("Withdraw Request Sent!", "success");
                 document.getElementById('wAmount').value = "";
@@ -928,6 +1128,31 @@
             btn.innerText = "Request Payment";
         }
 
+        // --- SUPPORT CHANNELS ---
+        function renderSupportChannels() {
+            const container = document.getElementById('supportList');
+            container.innerHTML = '';
+            
+            adminConfig.supportLinks.forEach(link => {
+                const div = document.createElement('div');
+                div.className = 'glass';
+                div.style.padding = '15px';
+                div.style.marginBottom = '10px';
+                div.style.display = 'flex';
+                div.style.alignItems = 'center';
+                div.style.cursor = 'pointer';
+                div.onclick = () => window.open(link.url, '_blank');
+                
+                div.innerHTML = `
+                    <i class="${link.icon || 'fas fa-link'}" style="font-size:1.5rem; width:40px; color:var(--primary);"></i>
+                    <div style="font-weight:600; font-size:0.9rem;">${link.title}</div>
+                    <i class="fas fa-chevron-right" style="margin-left:auto; color:#666;"></i>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // --- HELPERS ---
         function toggleHistory(show) {
             const sheet = document.getElementById('historySheet');
             const overlay = document.getElementById('sheetOverlay');
@@ -943,7 +1168,7 @@
 
         async function loadHistory() {
             const list = document.getElementById('histList');
-            list.innerHTML = '<div style="text-align:center; padding:20px;"><div class="spinner-ring" style="width:20px;height:20px; border:2px solid orange; border-radius:50%;"></div></div>';
+            list.innerHTML = '<p style="text-align:center;">Loading...</p>';
             try {
                 const snap = await db.collection('withdrawals').where('uid', '==', currentUser).orderBy('date', 'desc').limit(20).get();
                 if(snap.empty) {
@@ -957,7 +1182,7 @@
                     html += `
                     <div class="hist-item">
                         <div>
-                            <div style="font-weight:bold; text-transform:capitalize;">${data.method}</div>
+                            <div style="font-weight:bold; text-transform:capitalize;">${data.method} (${data.number})</div>
                             <div style="font-size:0.75rem; color:#666;">${data.source.toUpperCase()} Balance</div>
                         </div>
                         <div style="text-align:right;">
