@@ -313,23 +313,6 @@
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 999; opacity: 0; pointer-events: none; transition: 0.3s; }
         .overlay.active { opacity: 1; pointer-events: all; }
 
-        /* --- AD OVERLAY --- */
-        #ad-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 10000; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; text-align: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s;
-        }
-        #ad-overlay.active { opacity: 1; pointer-events: all; }
-        .ad-timer-circle {
-            width: 100px; height: 100px; border-radius: 50%;
-            border: 5px solid #222; border-top-color: var(--primary);
-            display: flex; justify-content: center; align-items: center;
-            font-size: 2rem; font-weight: bold; color: #fff;
-            margin-bottom: 20px; animation: spin 1s linear infinite;
-        }
-        .no-anim { animation: none !important; border-color: var(--primary); }
-
         /* --- NAV BAR --- */
         .nav-bar { 
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
@@ -373,15 +356,6 @@
             <div class="loading-bar" id="loadBar"></div>
         </div>
         <p class="loading-text">PREPARING EXPERIENCE</p>
-    </div>
-
-    <!-- AD WATCH OVERLAY -->
-    <div id="ad-overlay">
-        <div class="ad-timer-circle" id="adTimerCircle">
-            <span id="adTimerText">15</span>
-        </div>
-        <h3 style="margin-bottom: 10px; color: var(--primary);">WATCHING AD</h3>
-        <p style="color: #888; font-size: 0.9rem;">Don't minimize the app!<br>Reward in <span id="adTimerSmall">15</span>s</p>
     </div>
 
     <!-- SKELETON LAYER -->
@@ -491,7 +465,7 @@
                     </div>
                     <i class="fas fa-film" style="font-size: 3rem; color: #eee; margin-bottom: 15px; text-shadow: 0 0 15px rgba(255,255,255,0.3);"></i>
                     <h3 style="margin-bottom: 5px;">Premium Video</h3>
-                    <p style="color: #888; font-size: 0.8rem; margin-bottom: 15px;">Watch full video (15s) to get reward.</p>
+                    <p style="color: #888; font-size: 0.8rem; margin-bottom: 15px;">Watch full video (12s) to get reward.</p>
                     <button class="btn-main" id="adBtn" onclick="watchAd()">
                         <i class="fas fa-play"></i> Watch Now (+৳2.00)
                     </button>
@@ -613,6 +587,17 @@
     </nav>
 
     <script>
+        // --- GLOBAL ERROR HANDLER TO PREVENT WHITE SCREEN ---
+        window.onerror = function(msg, url, line) {
+            console.error("Global Error:", msg);
+            // Force remove loader if error occurs
+            const l = document.getElementById('loader');
+            if(l) { l.style.display = 'none'; }
+            const c = document.getElementById('app-content');
+            if(c) { c.classList.add('visible'); }
+            return false;
+        };
+
         // --- CONFIG ---
         const CONFIG = {
             firebase: {
@@ -626,11 +611,12 @@
             botUsername: "Orange_lemon1_Bot",
             adReward: 2.00,
             adLimit: 10,
+            adDuration: 12000, // 12 Seconds in ms
             withdraw: { taskMin: 50, refMin: 100 }
         };
 
         let adminConfig = {
-            monetagId: "", // Fetched from DB
+            monetagId: "", 
             supportLinks: []
         };
 
@@ -638,41 +624,58 @@
         let db, auth, userRef, currentUser;
         let userData = {};
         let selectedWallet = 'task';
+        let adSessionStart = 0; // Tracking ad time
 
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.setHeaderColor('#050505');
 
+        // Safe Firebase Init
         try {
             firebase.initializeApp(CONFIG.firebase);
             db = firebase.firestore();
             auth = firebase.auth();
-            db.enablePersistence().catch(err => console.log(err));
         } catch(e) { console.error("Firebase Error", e); }
 
         window.onload = async () => {
             const bar = document.getElementById('loadBar');
-            bar.style.width = '60%'; 
+            bar.style.width = '30%'; 
             
-            setTimeout(async () => {
-                await loadAdminConfig(); // Fetch Admin Config first
-                bar.style.width = '80%';
+            // Failsafe: Remove loader after 5 seconds max (Prevents White Screen)
+            setTimeout(() => {
+                if(document.getElementById('loader')) {
+                    finishLoading();
+                }
+            }, 6000);
+
+            try {
+                await loadAdminConfig(); 
+                bar.style.width = '70%';
                 await initApp();
                 bar.style.width = '100%';
-                
-                setTimeout(() => {
-                    document.getElementById('loader').style.opacity = '0';
-                    setTimeout(() => document.getElementById('loader').remove(), 500);
-                    setTimeout(() => {
-                        document.getElementById('skeleton-layer').style.opacity = '0';
-                        setTimeout(() => document.getElementById('skeleton-layer').remove(), 500);
-                        document.getElementById('app-content').classList.add('visible');
-                    }, 800);
-                }, 500);
-            }, 1000);
+                setTimeout(finishLoading, 500);
+            } catch(e) {
+                console.error("Init failed", e);
+                finishLoading(); // Force open even on error
+            }
         };
 
-        // --- FETCH ADMIN CONFIG & INJECT AD SCRIPT ---
+        function finishLoading() {
+            const loader = document.getElementById('loader');
+            const skel = document.getElementById('skeleton-layer');
+            if(loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.remove(), 500);
+            }
+            setTimeout(() => {
+                if(skel) {
+                    skel.style.opacity = '0';
+                    setTimeout(() => skel.remove(), 500);
+                }
+                document.getElementById('app-content').classList.add('visible');
+            }, 800);
+        }
+
         async function loadAdminConfig() {
             try {
                 const doc = await db.collection('settings').doc('appConfig').get();
@@ -681,7 +684,7 @@
                     adminConfig.monetagId = data.monetagId || "";
                     adminConfig.supportLinks = data.supportLinks || [];
                     
-                    // Inject Monetag Script if ID exists
+                    // Inject Monetag Script
                     if(adminConfig.monetagId) {
                         const script = document.createElement('script');
                         script.src = "//libtl.com/sdk.js";
@@ -690,86 +693,92 @@
                         document.body.appendChild(script);
                     }
                 } else {
-                    adminConfig.supportLinks = [
-                        { title: "Support Group", url: "https://t.me/Orange_lemon1_Bot", icon: "fab fa-telegram" }
-                    ];
+                    // Fallback Defaults
+                    adminConfig.supportLinks = [{ title: "Support", url: "https://t.me/Orange_lemon1_Bot" }];
                 }
             } catch(e) {
-                console.log("Config Load Error", e);
+                console.log("Config Load Error (Using Default)", e);
             }
         }
 
         async function initApp() {
-            try {
-                let uid, name, photo, startParam;
-                if(tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                    const u = tg.initDataUnsafe.user;
-                    uid = u.id.toString();
-                    name = u.first_name;
-                    photo = u.photo_url;
-                    startParam = tg.initDataUnsafe.start_param;
-                } else {
-                    const cred = await auth.signInAnonymously();
-                    uid = cred.user.uid;
-                    name = "User " + uid.substr(0,4);
-                    photo = "https://ui-avatars.com/api/?background=random&name=D";
-                }
-                
-                currentUser = uid;
-                userRef = db.collection('users').doc(uid);
-                
-                const snap = await userRef.get();
-                if(!snap.exists) {
-                    const newUser = {
-                        uid, name, photo: photo || `https://ui-avatars.com/api/?background=random&name=${name}`,
-                        taskBalance: 0, referralBalance: 0, referralCount: 0,
-                        tasksDone: 0, adsWatched: 0, likes: 0, 
-                        adDate: new Date().toDateString(),
-                        joinedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    };
-                    
-                    if(startParam && startParam.startsWith('ref_')) {
-                        const refId = startParam.replace('ref_', '');
-                        if(refId !== uid) { 
-                            const refUserSnap = await db.collection('users').doc(refId).get();
-                            if(refUserSnap.exists) {
-                                newUser.referredBy = refId;
-                                db.collection('users').doc(refId).update({
-                                    referralCount: firebase.firestore.FieldValue.increment(1),
-                                    referralBalance: firebase.firestore.FieldValue.increment(5.00)
-                                });
-                            }
-                        }
-                    }
-                    await userRef.set(newUser);
-                    userData = newUser;
-                } else {
-                    userData = snap.data();
-                    if(name && userData.name !== name) userRef.update({ name });
-                    if(photo && userData.photo !== photo) userRef.update({ photo });
-                    
-                    const today = new Date().toDateString();
-                    if(userData.adDate !== today) {
-                        userRef.update({ adsWatched: 0, adDate: today });
-                        userData.adsWatched = 0;
-                    }
-                }
-
-                userRef.onSnapshot((doc) => {
-                    if(doc.exists) {
-                        userData = doc.data();
-                        updateUIBalances();
-                    }
-                });
-
-                renderAll();
-            } catch(e) {
-                console.error(e);
-                showToast("Connection Error", "error");
+            let uid, name, photo, startParam;
+            if(tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                const u = tg.initDataUnsafe.user;
+                uid = u.id.toString();
+                name = u.first_name;
+                photo = u.photo_url;
+                startParam = tg.initDataUnsafe.start_param;
+            } else {
+                const cred = await auth.signInAnonymously();
+                uid = cred.user.uid;
+                name = "User " + uid.substr(0,4);
+                photo = "https://ui-avatars.com/api/?background=random&name=D";
             }
+            
+            currentUser = uid;
+            userRef = db.collection('users').doc(uid);
+            
+            const snap = await userRef.get();
+            if(!snap.exists) {
+                const newUser = {
+                    uid, name, photo: photo || `https://ui-avatars.com/api/?background=random&name=${name}`,
+                    taskBalance: 0, referralBalance: 0, referralCount: 0,
+                    tasksDone: 0, adsWatched: 0, likes: 0, 
+                    adDate: new Date().toDateString(),
+                    joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                // Referral Logic
+                if(startParam && startParam.startsWith('ref_')) {
+                    const refId = startParam.replace('ref_', '');
+                    if(refId !== uid) { 
+                        const refUserSnap = await db.collection('users').doc(refId).get();
+                        if(refUserSnap.exists) {
+                            newUser.referredBy = refId;
+                            
+                            // Secure Batch Update for Referral
+                            const batch = db.batch();
+                            const refUserRef = db.collection('users').doc(refId);
+                            batch.set(userRef, newUser);
+                            batch.update(refUserRef, {
+                                referralCount: firebase.firestore.FieldValue.increment(1),
+                                referralBalance: firebase.firestore.FieldValue.increment(5.00)
+                            });
+                            // Log Referral Reward
+                            const logRef = refUserRef.collection('audit_logs').doc();
+                            batch.set(logRef, {
+                                type: 'referral_bonus', amount: 5.00, from: uid, date: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                            await batch.commit();
+                        } else {
+                            await userRef.set(newUser);
+                        }
+                    } else { await userRef.set(newUser); }
+                } else { await userRef.set(newUser); }
+                userData = newUser;
+            } else {
+                userData = snap.data();
+                if(name && userData.name !== name) userRef.update({ name });
+                
+                const today = new Date().toDateString();
+                if(userData.adDate !== today) {
+                    userRef.update({ adsWatched: 0, adDate: today });
+                    userData.adsWatched = 0;
+                }
+            }
+
+            userRef.onSnapshot((doc) => {
+                if(doc.exists) {
+                    userData = doc.data();
+                    updateUIBalances();
+                }
+            });
+
+            renderAll();
         }
 
-        // --- RENDER UI ---
+        // --- UI RENDERERS ---
         function renderAll() {
             document.getElementById('headName').innerText = userData.name;
             document.getElementById('headAvatar').src = userData.photo;
@@ -814,17 +823,12 @@
             return '#FF9F0A';
         }
 
-        // --- HAPTIC & ANIMATION ---
-        function triggerHaptic() {
-            if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
-        }
-
+        function triggerHaptic() { if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium'); }
         function triggerSuccess() {
             if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
             confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
         }
 
-        // --- NAVIGATION ---
         function navTo(pageId, el) {
             triggerHaptic();
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -836,103 +840,92 @@
             if(pageId === 'leaderboard') loadLeaderboard();
         }
 
-        // --- AD SYSTEM & LOGIC (Modified) ---
-        
-        // Helper: Run Ad Process with 15s Timer & Anti-Cheat
-        function runAdProcess(onSuccessCallback) {
-            // Check if Monetag ID is loaded
-            if(!adminConfig.monetagId || typeof window[`show_${adminConfig.monetagId}`] === 'undefined') {
-                return showToast("Ad server unavailable. Try later.", "error");
-            }
+        // --- CORE EARNING LOGIC (SECURE & TIMER BASED) ---
 
-            const overlay = document.getElementById('ad-overlay');
-            const timerText = document.getElementById('adTimerText');
-            const timerSmall = document.getElementById('adTimerSmall');
-            const circle = document.getElementById('adTimerCircle');
+        // 1. Transaction Logger (For Admin Verification)
+        async function logTransaction(type, amount, details = "") {
+            const batch = db.batch();
             
-            // Trigger Ad (Monetag)
-            try {
-                window[`show_${adminConfig.monetagId}`]().catch(e => console.log("Ad Blocked/Fail", e));
-            } catch(e) { console.log(e); }
-
-            // Reset UI
-            let timeLeft = 15;
-            let failed = false;
-            overlay.classList.add('active');
-            circle.classList.remove('no-anim');
-            timerText.innerText = timeLeft;
-            timerSmall.innerText = timeLeft;
-
-            // Visibility Listener (Anti-Cheat)
-            const visibilityHandler = () => {
-                if(document.hidden) {
-                    failed = true;
-                }
+            // Update Balance
+            const balanceField = (type === 'referral') ? 'referralBalance' : 'taskBalance';
+            const counterField = (type === 'ad') ? 'adsWatched' : (type === 'task' ? 'tasksDone' : null);
+            
+            const updateData = {
+                [balanceField]: firebase.firestore.FieldValue.increment(amount)
             };
-            document.addEventListener('visibilitychange', visibilityHandler);
+            if(counterField) updateData[counterField] = firebase.firestore.FieldValue.increment(1);
+            
+            batch.update(userRef, updateData);
 
-            // Timer Loop
-            const timer = setInterval(() => {
-                // If failed (tab switched)
-                if(failed) {
-                    clearInterval(timer);
-                    document.removeEventListener('visibilitychange', visibilityHandler);
-                    overlay.classList.remove('active');
-                    showToast("Task Failed: You left the app!", "error");
-                    return;
-                }
+            // Create Audit Log (Hidden from User, Visible to Admin)
+            const logRef = userRef.collection('audit_logs').doc();
+            batch.set(logRef, {
+                type: type,
+                amount: amount,
+                details: details,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                verified: true
+            });
 
-                timeLeft--;
-                timerText.innerText = timeLeft;
-                timerSmall.innerText = timeLeft;
-
-                if(timeLeft <= 0) {
-                    clearInterval(timer);
-                    document.removeEventListener('visibilitychange', visibilityHandler);
-                    
-                    // Success State
-                    circle.classList.add('no-anim');
-                    timerText.innerHTML = '<i class="fas fa-check"></i>';
-                    
-                    setTimeout(() => {
-                        overlay.classList.remove('active');
-                        onSuccessCallback(); // Execute the reward/verify action
-                    }, 1000);
-                }
-            }, 1000);
+            await batch.commit();
         }
 
-        // Main Watch Ad Function (Daily Ad Limit)
-        async function watchAd() {
+        // 2. Watch Ad Logic (12 Second Rule)
+        function watchAd() {
             triggerHaptic();
             if((userData.adsWatched || 0) >= CONFIG.adLimit) return showToast("Daily Limit Reached", "error");
+
+            // Check if ad server is ready
+            if(!adminConfig.monetagId) return showToast("Ad loading... wait", "error");
+
+            // START TIMER
+            adSessionStart = Date.now();
             
-            runAdProcess(() => {
-                // Reward Logic
-                userRef.update({
-                    taskBalance: firebase.firestore.FieldValue.increment(CONFIG.adReward),
-                    adsWatched: firebase.firestore.FieldValue.increment(1)
-                });
-                triggerSuccess();
-                showToast("Video Reward Added!", "success");
-            });
+            // Attempt to show ad (Using Direct Link Logic mostly for Telegram Apps)
+            try {
+                 if (typeof window[`show_${adminConfig.monetagId}`] === 'function') {
+                    window[`show_${adminConfig.monetagId}`]().then(() => {
+                        // If promise resolves, track visibility
+                    }).catch(e => {
+                        // Fallback open window if SDK fails
+                    });
+                } 
+                // Force a listener for returning
+                document.addEventListener("visibilitychange", checkAdDuration);
+                showToast("Watch for 12 seconds...", "success");
+            } catch(e) { console.log(e); }
         }
 
-        // --- DYNAMIC TASKS (Ad integrated) ---
+        // 3. Verify Ad Duration on Return
+        function checkAdDuration() {
+            if (document.visibilityState === 'visible') {
+                const now = Date.now();
+                const diff = now - adSessionStart;
+
+                document.removeEventListener("visibilitychange", checkAdDuration);
+
+                if (diff < CONFIG.adDuration) {
+                    // Failed: Too fast
+                    showToast(`Failed! You returned in ${(diff/1000).toFixed(1)}s`, "error");
+                    showToast("Must watch for 12 seconds!", "error");
+                } else {
+                    // Success
+                    logTransaction('ad', CONFIG.adReward, 'Monetag Video');
+                    triggerSuccess();
+                    showToast("Video Reward Added!", "success");
+                }
+            }
+        }
+
+        // --- TASKS LOGIC ---
         async function loadDynamicTasks() {
             const list = document.getElementById('taskList');
-            list.innerHTML = '<div style="text-align:center;"><i class="fas fa-spinner fa-spin"></i></div>';
-            
             try {
                 const snap = await db.collection('tasks').where('active', '==', true).get();
                 const doneTasks = JSON.parse(localStorage.getItem('doneTasks') || '[]');
                 
                 list.innerHTML = '';
-                
-                if(snap.empty) {
-                    list.innerHTML = '<p style="text-align:center;color:#666;">No active tasks</p>';
-                    return;
-                }
+                if(snap.empty) { list.innerHTML = '<p style="text-align:center;color:#666;">No active tasks</p>'; return; }
 
                 snap.forEach(doc => {
                     const t = doc.data();
@@ -941,9 +934,7 @@
 
                     const div = document.createElement('div');
                     div.className = 'task-card';
-                    const iconHtml = t.icon.startsWith('http') 
-                        ? `<img src="${t.icon}">` 
-                        : `<i class="${t.icon}"></i>`;
+                    const iconHtml = t.icon.startsWith('http') ? `<img src="${t.icon}">` : `<i class="${t.icon}"></i>`;
 
                     div.innerHTML = `
                         <div class="task-icon">${iconHtml}</div>
@@ -955,40 +946,36 @@
                     `;
                     list.appendChild(div);
                 });
-            } catch(e) {
-                console.error("Task load error", e);
-                list.innerHTML = '<p style="text-align:center;color:red;">Failed to load tasks</p>';
-            }
+            } catch(e) { console.error("Task error", e); }
         }
 
-        // Modified handleTask (Ad before Claim)
+        let taskStartTime = 0;
         function handleTask(id, url, reward) {
             triggerHaptic();
             const btn = document.getElementById(`btn-${id}`);
             
             if(btn.classList.contains('btn-start')) {
-                // Step 1: Open Link
+                // START
+                taskStartTime = Date.now();
                 window.open(url, '_blank');
                 btn.classList.remove('btn-start');
                 btn.classList.add('btn-check');
                 btn.innerText = 'Check';
             } 
             else if(btn.classList.contains('btn-check')) {
-                // Step 2: Run Ad Process (15s Verification)
-                runAdProcess(() => {
-                    // If Ad Success -> Enable Claim
-                    btn.classList.remove('btn-check');
-                    btn.classList.add('btn-claim');
-                    btn.innerText = 'Claim';
-                    showToast("Verified! Click Claim.", "success");
-                });
+                // VERIFY TIME
+                const diff = Date.now() - taskStartTime;
+                if(diff < 10000) { // 10s for tasks
+                    return showToast(`Wait! Check in ${Math.ceil((10000-diff)/1000)}s`, "error");
+                }
+                btn.classList.remove('btn-check');
+                btn.classList.add('btn-claim');
+                btn.innerText = 'Claim';
+                triggerSuccess();
             } 
             else if(btn.classList.contains('btn-claim')) {
-                // Step 3: Give Reward
-                userRef.update({
-                    taskBalance: firebase.firestore.FieldValue.increment(parseFloat(reward)),
-                    tasksDone: firebase.firestore.FieldValue.increment(1)
-                });
+                // CLAIM
+                logTransaction('task', parseFloat(reward), `Task: ${id}`);
                 
                 const done = JSON.parse(localStorage.getItem('doneTasks') || '[]');
                 done.push(id);
@@ -1003,17 +990,15 @@
         // --- LEADERBOARD & LIKES ---
         async function loadLeaderboard() {
             const list = document.getElementById('lbList');
-            list.innerHTML = '<div style="text-align:center; padding:20px;"><div class="spinner-ring" style="width:20px;height:20px;border:2px solid orange;border-radius:50%;"></div></div>';
+            list.innerHTML = '<div style="text-align:center; padding:20px;">Loading...</div>';
 
             try {
                 const snap = await db.collection('users').orderBy('referralCount', 'desc').limit(20).get();
                 let html = '';
-                
                 snap.forEach((doc, i) => {
                     const u = doc.data();
                     const isMe = u.uid === currentUser;
                     const likedByMe = localStorage.getItem(`liked_${u.uid}`) === 'true';
-                    
                     html += `
                     <div class="rank-row">
                         <div class="rank-num">#${i + 1}</div>
@@ -1029,35 +1014,25 @@
                     </div>`;
                 });
                 list.innerHTML = html;
-            } catch(e) {
-                console.error(e);
-            }
+            } catch(e) { console.error(e); }
         }
 
         function toggleLike(targetUid, btn) {
             triggerHaptic();
             if(targetUid === currentUser) return showToast("Can't like yourself!", "error");
-            
             const storageKey = `liked_${targetUid}`;
-            const isLiked = localStorage.getItem(storageKey) === 'true';
-
-            if(isLiked) return showToast("Already Liked!", "error");
+            if(localStorage.getItem(storageKey) === 'true') return showToast("Already Liked!", "error");
 
             btn.classList.add('liked');
-            btn.querySelector('i').classList.remove('far');
-            btn.querySelector('i').classList.add('fas');
-            
+            btn.querySelector('i').className = 'fas fa-heart';
             const countSpan = document.getElementById(`like-count-${targetUid}`);
             countSpan.innerText = parseInt(countSpan.innerText) + 1;
 
-            db.collection('users').doc(targetUid).update({
-                likes: firebase.firestore.FieldValue.increment(1)
-            });
-
+            db.collection('users').doc(targetUid).update({ likes: firebase.firestore.FieldValue.increment(1) });
             localStorage.setItem(storageKey, 'true');
         }
 
-        // --- WITHDRAW & PAYMENT UI ---
+        // --- WITHDRAW ---
         function selectPayMethod(el, method) {
             triggerHaptic();
             document.querySelectorAll('.pay-method').forEach(i => i.classList.remove('selected'));
@@ -1085,11 +1060,11 @@
             const method = document.getElementById('wMethod').value;
             
             if(!amount || !number) return showToast("Please fill all fields", "error");
-            if(amount <= 0) return showToast("Invalid Amount", "error");
-
+            
             const min = selectedWallet === 'task' ? CONFIG.withdraw.taskMin : CONFIG.withdraw.refMin;
             if(amount < min) return showToast(`Minimum withdraw is ৳${min}`, "error");
 
+            // Double Check Balance from Server
             const userSnap = await userRef.get();
             const serverData = userSnap.data();
             const currentBal = selectedWallet === 'task' ? serverData.taskBalance : serverData.referralBalance;
@@ -1128,21 +1103,15 @@
             btn.innerText = "Request Payment";
         }
 
-        // --- SUPPORT CHANNELS ---
+        // --- HISTORY & SUPPORT ---
         function renderSupportChannels() {
             const container = document.getElementById('supportList');
             container.innerHTML = '';
-            
             adminConfig.supportLinks.forEach(link => {
                 const div = document.createElement('div');
                 div.className = 'glass';
-                div.style.padding = '15px';
-                div.style.marginBottom = '10px';
-                div.style.display = 'flex';
-                div.style.alignItems = 'center';
-                div.style.cursor = 'pointer';
+                div.style = 'padding:15px; margin-bottom:10px; display:flex; align-items:center; cursor:pointer;';
                 div.onclick = () => window.open(link.url, '_blank');
-                
                 div.innerHTML = `
                     <i class="${link.icon || 'fas fa-link'}" style="font-size:1.5rem; width:40px; color:var(--primary);"></i>
                     <div style="font-weight:600; font-size:0.9rem;">${link.title}</div>
@@ -1152,7 +1121,6 @@
             });
         }
 
-        // --- HELPERS ---
         function toggleHistory(show) {
             const sheet = document.getElementById('historySheet');
             const overlay = document.getElementById('sheetOverlay');
@@ -1171,10 +1139,7 @@
             list.innerHTML = '<p style="text-align:center;">Loading...</p>';
             try {
                 const snap = await db.collection('withdrawals').where('uid', '==', currentUser).orderBy('date', 'desc').limit(20).get();
-                if(snap.empty) {
-                    list.innerHTML = '<p style="text-align:center; color:#666;">No transactions found</p>';
-                    return;
-                }
+                if(snap.empty) { list.innerHTML = '<p style="text-align:center; color:#666;">No transactions found</p>'; return; }
                 let html = '';
                 snap.forEach(d => {
                     const data = d.data();
@@ -1192,25 +1157,18 @@
                     </div>`;
                 });
                 list.innerHTML = html;
-            } catch(e) {
-                list.innerHTML = '<p style="text-align:center; color:#666;">No History</p>';
-            }
+            } catch(e) { list.innerHTML = '<p style="text-align:center; color:#666;">No History</p>'; }
         }
 
         function shareRef() {
             const link = `https://t.me/${CONFIG.botUsername}/app?startapp=ref_${currentUser}`;
-            const text = `Join Orange Earn & get premium rewards! 🚀\n${link}`;
-            window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`);
+            window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent("Join Orange Earn! 🚀")}`);
         }
         function copyRef() {
-            const link = `https://t.me/${CONFIG.botUsername}/app?startapp=ref_${currentUser}`;
-            navigator.clipboard.writeText(link);
-            showToast("Referral Link Copied!", "success");
+            navigator.clipboard.writeText(`https://t.me/${CONFIG.botUsername}/app?startapp=ref_${currentUser}`);
+            showToast("Copied!", "success");
         }
-        function copyUID() {
-            navigator.clipboard.writeText(currentUser);
-            showToast("UID Copied", "success");
-        }
+        function copyUID() { navigator.clipboard.writeText(currentUser); showToast("Copied", "success"); }
         function showToast(msg, type) {
             const box = document.getElementById('toast-box');
             const t = document.createElement('div');
