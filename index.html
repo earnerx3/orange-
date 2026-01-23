@@ -1,4 +1,4 @@
-<!-- START OF FILE Orange Earn - Secure Version -->
+<!-- START OF FILE Orange Earn - Updated Secure Version -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,6 +18,9 @@
     <!-- Confetti Library -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
+    <!-- GIGAPUB AD SCRIPT -->
+    <script src="https://ad.gigapub.tech/script?id=5411"></script>
+
     <style>
         :root {
             /* --- PREMIUM PALETTE --- */
@@ -33,7 +36,7 @@
             --text-muted: #888888;
             
             --grad-gold: linear-gradient(135deg, #FFD60A, #FF9F0A);
-            --glass-bg: rgba(20, 20, 20, 0.75);
+            --glass-bg: rgba(20, 20, 20, 0.85); /* একটু ডার্ক করা হয়েছে ব্যাকগ্রাউন্ড ইমেজ স্পষ্ট করার জন্য */
             --glass-border: 1px solid rgba(255, 255, 255, 0.08);
             --rgb-anim: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
         }
@@ -41,33 +44,16 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            background-color: var(--bg-dark);
+            /* BACKGROUND IMAGE UPDATE */
+            background: url('cover.png') no-repeat center center fixed;
+            background-size: cover;
+            background-color: var(--bg-dark); /* Fallback */
             color: var(--text-main);
             font-family: 'Sora', sans-serif;
             height: 100vh;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-        }
-
-        /* --- LAVA BACKGROUND FX --- */
-        .bg-fx {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: #050505; overflow: hidden;
-        }
-        .blob {
-            position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4;
-            animation: lavaMove 20s infinite alternate;
-        }
-        .blob:nth-child(1) { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #FF9F0A; animation-delay: 0s; }
-        .blob:nth-child(2) { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: #6a00ff; animation-delay: -5s; }
-        .blob:nth-child(3) { top: 40%; left: 40%; width: 40vw; height: 40vw; background: #ff0055; animation-delay: -10s; }
-
-        @keyframes lavaMove {
-            0% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(30px, -50px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.9); }
-            100% { transform: translate(0, 0) scale(1); }
         }
 
         /* --- UTILS --- */
@@ -87,7 +73,7 @@
         /* --- SKELETON LOADER --- */
         .skeleton-box {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50;
-            background: var(--bg-dark); padding: 20px; display: flex; flex-direction: column; gap: 20px;
+            background: #000; padding: 20px; display: flex; flex-direction: column; gap: 20px;
             transition: opacity 0.5s ease;
         }
         .skeleton {
@@ -125,7 +111,7 @@
 
         /* --- HEADER & BALANCE --- */
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .profile-chip { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); padding: 5px 15px 5px 5px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); }
+        .profile-chip { display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.6); padding: 5px 15px 5px 5px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
         .user-av { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid var(--secondary); }
         .balance-master { padding: 25px; position: relative; overflow: hidden; text-align: center; margin-bottom: 25px; }
         .balance-master::after {
@@ -155,7 +141,7 @@
 
         /* --- TASK CARD --- */
         .task-card {
-            background: #181818; padding: 15px; border-radius: 16px; margin-bottom: 12px;
+            background: rgba(24, 24, 24, 0.9); padding: 15px; border-radius: 16px; margin-bottom: 12px;
             display: flex; align-items: center; gap: 15px; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s;
         }
         .task-card:active { transform: scale(0.98); background: #202020; }
@@ -169,7 +155,7 @@
         /* --- WALLET --- */
         .wallet-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
         .w-card {
-            padding: 20px; border-radius: 18px; border: 1px solid #333; background: #161616; cursor: pointer;
+            padding: 20px; border-radius: 18px; border: 1px solid #333; background: rgba(22, 22, 22, 0.95); cursor: pointer;
             transition: 0.3s; position: relative; overflow: hidden;
         }
         .w-card.selected { border-color: var(--primary); background: rgba(255, 159, 10, 0.05); box-shadow: 0 0 20px rgba(255, 159, 10, 0.15) inset; }
@@ -189,7 +175,7 @@
 
         /* --- RANK & LIKES --- */
         .rank-list { padding-bottom: 70px; } 
-        .rank-row { display: flex; align-items: center; padding: 12px; margin-bottom: 8px; background: #151515; border-radius: 12px; border: 1px solid #222; }
+        .rank-row { display: flex; align-items: center; padding: 12px; margin-bottom: 8px; background: rgba(21, 21, 21, 0.9); border-radius: 12px; border: 1px solid #222; }
         .rank-num { font-weight: 800; font-size: 1.1rem; width: 35px; color: #555; font-style: italic; }
         .rank-row:nth-child(1) .rank-num { color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
         .rank-row:nth-child(2) .rank-num { color: #C0C0C0; }
@@ -283,13 +269,6 @@
 
     <!-- TOASTS -->
     <div id="toast-box"></div>
-
-    <!-- BACKGROUND WITH LAVA EFFECT -->
-    <div class="bg-fx">
-        <div class="blob"></div>
-        <div class="blob"></div>
-        <div class="blob"></div>
-    </div>
 
     <!-- APP CONTENT -->
     <div id="app-content">
@@ -514,6 +493,7 @@
         let db, auth, userRef, currentUser;
         let userData = {};
         let selectedWallet = 'task';
+        let useGigaPub = false; // Toggle Switch for Ad Networks
 
         const tg = window.Telegram.WebApp;
         tg.expand();
@@ -557,7 +537,7 @@
                     adminConfig.monetagId = data.monetagId || "";
                     adminConfig.supportLinks = data.supportLinks || [];
                     
-                    // Inject Monetag Script if ID exists
+                    // Inject Monetag Script if ID exists (GigaPub is already in Head)
                     if(adminConfig.monetagId) {
                         const script = document.createElement('script');
                         script.src = "//libtl.com/sdk.js";
@@ -711,7 +691,7 @@
             if(pageId === 'leaderboard') loadLeaderboard();
         }
 
-        // --- SECURE AD SYSTEM (Apple Style Logic) ---
+        // --- HYBRID AD SYSTEM (MONETAG + GIGAPUB) ---
         async function watchAd() {
             triggerHaptic();
             
@@ -720,34 +700,55 @@
                 return showToast("Daily Limit Reached", "error");
             }
 
-            // 2. Check SDK
-            const adFuncName = `show_${adminConfig.monetagId}`;
-            if(!adminConfig.monetagId || typeof window[adFuncName] === 'undefined') {
-                return showToast("Ad is loading... Please wait 3s", "error");
-            }
-
-            // 3. Start Time Check
-            const startTime = Date.now();
-            showToast("Processing video...", "info");
-            
-            try {
-                // Wait for ad to close
-                await window[adFuncName]();
+            // 2. Decide Network (Toggle Logic)
+            if (useGigaPub) {
+                // --- SHOW GIGAPUB ---
+                if (typeof window.showGiga === 'undefined') {
+                     showToast("Ad Loading... Try again in 3s", "error");
+                     return;
+                }
                 
-                // Calculate Duration
-                const endTime = Date.now();
-                const duration = endTime - startTime;
-
-                // 10000ms = 10 Seconds Threshold
-                if (duration < 10000) {
-                    showToast("Video too short! No reward.", "error");
-                } else {
+                showToast("Loading Video... (G)", "info");
+                
+                window.showGiga()
+                  .then(() => {
                     completeAdReward();
+                    useGigaPub = !useGigaPub; // Switch to Monetag next
+                  })
+                  .catch(e => {
+                    console.error("GigaPub Error:", e);
+                    showToast("Video failed to load. Retrying...", "error");
+                    useGigaPub = !useGigaPub; // Switch to Monetag on fail too
+                  });
+            
+            } else {
+                // --- SHOW MONETAG ---
+                const adFuncName = `show_${adminConfig.monetagId}`;
+                if(!adminConfig.monetagId || typeof window[adFuncName] === 'undefined') {
+                    showToast("Ad Loading... Try again in 3s", "error");
+                    return;
                 }
 
-            } catch(err) {
-                console.error("Ad Error:", err);
-                showToast("Ad failed to load. Try again.", "error");
+                const startTime = Date.now();
+                showToast("Loading Video... (M)", "info");
+                
+                try {
+                    await window[adFuncName]();
+                    const endTime = Date.now();
+                    const duration = endTime - startTime;
+
+                    if (duration < 5000) { // 5s Threshold for basic check
+                        showToast("Video too short! No reward.", "error");
+                    } else {
+                        completeAdReward();
+                    }
+                    useGigaPub = !useGigaPub; // Switch to GigaPub next
+
+                } catch(err) {
+                    console.error("Monetag Error:", err);
+                    showToast("Video failed. Retrying...", "error");
+                    useGigaPub = !useGigaPub; // Switch to GigaPub on fail too
+                }
             }
         }
 
