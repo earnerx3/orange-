@@ -1,10 +1,10 @@
-<!-- START OF FILE Orange Earn - Updated Secure Version -->
+<!-- START OF FILE Orange Earn - Multi-Language Global Version (Dynamic Payment Updated) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Orange Earn - Secure Premium</title>
+    <title>Orange Earn - Global Secure</title>
     
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -36,7 +36,7 @@
             --text-muted: #888888;
             
             --grad-gold: linear-gradient(135deg, #FFD60A, #FF9F0A);
-            --glass-bg: rgba(20, 20, 20, 0.85); /* একটু ডার্ক করা হয়েছে ব্যাকগ্রাউন্ড ইমেজ স্পষ্ট করার জন্য */
+            --glass-bg: rgba(20, 20, 20, 0.85); 
             --glass-border: 1px solid rgba(255, 255, 255, 0.08);
             --rgb-anim: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
         }
@@ -44,7 +44,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            /* BACKGROUND IMAGE UPDATE */
             background: url('cover.png') no-repeat center center fixed;
             background-size: cover;
             background-color: var(--bg-dark); /* Fallback */
@@ -69,6 +68,27 @@
         }
         .btn-main:active { transform: scale(0.96); box-shadow: 0 0 5px rgba(255, 159, 10, 0.4); }
         .btn-main:disabled { filter: grayscale(1); opacity: 0.6; cursor: not-allowed; }
+
+        /* --- LANGUAGE MODAL --- */
+        #lang-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 1; transition: opacity 0.5s;
+        }
+        .lang-card {
+            background: #151515; border: 1px solid var(--primary); padding: 25px; border-radius: 25px;
+            width: 85%; max-width: 350px; text-align: center; box-shadow: 0 0 30px rgba(255, 159, 10, 0.2);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 80vh; overflow-y: auto;
+        }
+        .lang-btn {
+            background: #222; border: 1px solid #333; color: #fff; padding: 12px; margin: 8px 0;
+            width: 100%; border-radius: 12px; display: flex; align-items: center; justify-content: space-between;
+            cursor: pointer; transition: 0.3s; font-size: 1rem;
+        }
+        .lang-btn:hover, .lang-btn:active {
+            background: var(--primary); color: #000; border-color: var(--primary); transform: scale(1.02);
+        }
 
         /* --- SKELETON LOADER --- */
         .skeleton-box {
@@ -163,7 +183,10 @@
         .w-card.selected i { color: var(--primary); transform: translateY(-3px); }
         .check-mark { position: absolute; top: 10px; right: 10px; color: var(--primary); font-size: 1rem; opacity: 0; transform: scale(0); transition: 0.3s; }
         .w-card.selected .check-mark { opacity: 1; transform: scale(1); }
+        
+        /* UPDATED: Payment Grid Container for Dynamic Injection */
         .pay-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        
         .pay-method {
             background: #222; padding: 12px 5px; text-align: center; border-radius: 12px; border: 1px solid #333;
             cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; font-size: 0.85rem; color: #aaa;
@@ -224,6 +247,7 @@
         .toast { background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(10px); color: #fff; padding: 12px 20px; border-radius: 12px; display: flex; align-items: center; gap: 10px; border-left: 4px solid var(--primary); box-shadow: 0 5px 20px rgba(0,0,0,0.5); animation: fadeUp 0.3s forwards; }
 
         @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
         @keyframes rgbFlow { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
         @keyframes rotateBg { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -235,6 +259,40 @@
 </head>
 <body>
 
+    <!-- LANGUAGE SELECTION MODAL -->
+    <div id="lang-overlay" style="display:none;">
+        <div class="lang-card">
+            <i class="fas fa-globe" style="font-size: 3rem; color: var(--primary); margin-bottom: 20px;"></i>
+            <h2 style="margin-bottom: 10px; color: #fff;">Select Language</h2>
+            <p style="color: #888; margin-bottom: 25px;">Choose your region & language</p>
+            
+            <div class="lang-btn" onclick="selectLanguage('bn')">
+                <span><span style="font-size: 1.2rem;">🇧🇩</span> বাংলা (Bengali)</span>
+                <i class="fas fa-chevron-right"></i>
+            </div>
+            
+            <div class="lang-btn" onclick="selectLanguage('hi')">
+                <span><span style="font-size: 1.2rem;">🇮🇳</span> हिंदी (Hindi)</span>
+                <i class="fas fa-chevron-right"></i>
+            </div>
+            
+            <div class="lang-btn" onclick="selectLanguage('en')">
+                <span><span style="font-size: 1.2rem;">🇺🇸</span> English (USA)</span>
+                <i class="fas fa-chevron-right"></i>
+            </div>
+
+            <div class="lang-btn" onclick="selectLanguage('ms')">
+                <span><span style="font-size: 1.2rem;">🇲🇾</span> Malay (Malaysia)</span>
+                <i class="fas fa-chevron-right"></i>
+            </div>
+
+            <div class="lang-btn" onclick="selectLanguage('ca')">
+                <span><span style="font-size: 1.2rem;">🇨🇦</span> English (Canada)</span>
+                <i class="fas fa-chevron-right"></i>
+            </div>
+        </div>
+    </div>
+
     <!-- PREMIUM LOADER -->
     <div id="loader">
         <div class="logo-container">
@@ -244,7 +302,7 @@
         <div class="loading-bar-wrap">
             <div class="loading-bar" id="loadBar"></div>
         </div>
-        <p class="loading-text">PREPARING EXPERIENCE</p>
+        <p class="loading-text" data-i18n="loading">PREPARING EXPERIENCE</p>
     </div>
 
     <!-- SKELETON LAYER -->
@@ -280,7 +338,7 @@
                     <img src="" id="headAvatar" class="user-av">
                     <div style="line-height: 1.1;">
                         <div style="font-size: 0.85rem; font-weight: 700;" id="headName">Guest</div>
-                        <div style="font-size: 0.65rem; color: var(--primary);">LVL: <span id="headLvl">1</span></div>
+                        <div style="font-size: 0.65rem; color: var(--primary);"><span data-i18n="level">LVL</span>: <span id="headLvl">1</span></div>
                     </div>
                 </div>
                 <div style="background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 12px; font-size: 0.9rem;">
@@ -290,18 +348,18 @@
             </div>
 
             <div class="balance-master glass">
-                <p style="color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;">Total Balance</p>
-                <h1 class="text-grad" style="font-size: 2.8rem; margin: 5px 0;">৳ <span id="mainBal">0.00</span></h1>
+                <p style="color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;" data-i18n="total_balance">Total Balance</p>
+                <h1 class="text-grad" style="font-size: 2.8rem; margin: 5px 0;"><span class="currency-symbol">৳</span> <span id="mainBal">0.00</span></h1>
                 
                 <div class="stats-row">
                     <div class="mini-stat">
                         <i class="fas fa-users" style="color: var(--primary); margin-bottom: 5px;"></i>
-                        <div style="color: #aaa;">Referrals</div>
+                        <div style="color: #aaa;" data-i18n="referrals">Referrals</div>
                         <div style="font-weight: bold; font-size: 1rem;" id="statRef">0</div>
                     </div>
                     <div class="mini-stat">
                         <i class="fas fa-check-circle" style="color: var(--success); margin-bottom: 5px;"></i>
-                        <div style="color: #aaa;">Tasks Done</div>
+                        <div style="color: #aaa;" data-i18n="tasks_done">Tasks Done</div>
                         <div style="font-weight: bold; font-size: 1rem;" id="statTask">0</div>
                     </div>
                 </div>
@@ -311,12 +369,12 @@
             <div class="rgb-box">
                 <div class="rgb-inner">
                     <i class="fas fa-gift" style="font-size: 2.5rem; color: var(--secondary); margin-bottom: 10px; filter: drop-shadow(0 0 10px var(--primary));"></i>
-                    <h3 style="margin-bottom: 5px;">Invite Friends</h3>
+                    <h3 style="margin-bottom: 5px;" data-i18n="invite_friends">Invite Friends</h3>
                     <p style="color: #888; font-size: 0.85rem; text-align: center; margin-bottom: 15px;">
-                        Earn <span style="color: var(--primary); font-weight: bold;">৳ <span id="refRate">5.00</span></span> for every friend who joins!
+                        <span data-i18n="invite_desc">Earn</span> <span style="color: var(--primary); font-weight: bold;"><span class="currency-symbol">৳</span> <span id="refRate">5.00</span></span> <span data-i18n="invite_desc_2">for every friend!</span>
                     </p>
                     <div style="display: flex; gap: 10px; width: 100%;">
-                        <button class="btn-main" onclick="shareRef()"><i class="fas fa-paper-plane"></i> Share Link</button>
+                        <button class="btn-main" onclick="shareRef()"><i class="fas fa-paper-plane"></i> <span data-i18n="share_link">Share Link</span></button>
                         <button class="glass" onclick="copyRef()" style="width: 50px; border: 1px solid #333; cursor: pointer; display:grid; place-items:center;"><i class="fas fa-copy"></i></button>
                     </div>
                 </div>
@@ -325,36 +383,36 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                 <div class="glass" style="padding: 20px; text-align: center; cursor: pointer;" onclick="navTo('tasks')">
                     <i class="fas fa-play-circle" style="font-size: 2rem; color: var(--primary); margin-bottom: 10px;"></i>
-                    <h4>Video Zone</h4>
+                    <h4 data-i18n="video_zone">Video Zone</h4>
                 </div>
                 <div class="glass" style="padding: 20px; text-align: center; cursor: pointer;" onclick="navTo('leaderboard')">
                     <i class="fas fa-trophy" style="font-size: 2rem; color: var(--secondary); margin-bottom: 10px;"></i>
-                    <h4>Top Rank</h4>
+                    <h4 data-i18n="top_rank">Top Rank</h4>
                 </div>
             </div>
         </div>
 
         <!-- TASKS PAGE -->
         <div id="tasks" class="page">
-            <h2 style="margin-bottom: 20px;">Earn Zone <span style="font-size: 1rem; color: #666;">/ Daily</span></h2>
+            <h2 style="margin-bottom: 20px;"><span data-i18n="earn_zone">Earn Zone</span> <span style="font-size: 1rem; color: #666;">/ <span data-i18n="daily">Daily</span></span></h2>
 
             <!-- PREMIUM ROTATING AD BORDER -->
             <div class="ad-zone-wrap">
                 <div class="ad-zone">
                     <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 10px; color: #888;">
-                        <span>Daily Limit</span>
+                        <span data-i18n="daily_limit">Daily Limit</span>
                         <span style="color: #fff;"><span id="adCount">0</span>/10</span>
                     </div>
                     <i class="fas fa-film" style="font-size: 3rem; color: #eee; margin-bottom: 15px; text-shadow: 0 0 15px rgba(255,255,255,0.3);"></i>
-                    <h3 style="margin-bottom: 5px;">Premium Video</h3>
-                    <p style="color: #888; font-size: 0.8rem; margin-bottom: 15px;">Watch full video (10s+) to get reward.</p>
+                    <h3 style="margin-bottom: 5px;" data-i18n="premium_video">Premium Video</h3>
+                    <p style="color: #888; font-size: 0.8rem; margin-bottom: 15px;" data-i18n="watch_desc">Watch full video (10s+) to get reward.</p>
                     <button class="btn-main" id="adBtn" onclick="watchAd()">
-                        <i class="fas fa-play"></i> Watch Now (+৳2.00)
+                        <i class="fas fa-play"></i> <span data-i18n="watch_now">Watch Now</span> (+<span class="currency-symbol">৳</span>2.00)
                     </button>
                 </div>
             </div>
 
-            <h3 style="margin-bottom: 15px; font-size: 1.1rem;">Active Tasks</h3>
+            <h3 style="margin-bottom: 15px; font-size: 1.1rem;" data-i18n="active_tasks">Active Tasks</h3>
             <div id="taskList">
                 <!-- JS Will Inject Tasks (Admin Controlled) -->
                 <p style="text-align: center; color: #666; padding: 20px;">Loading Tasks...</p>
@@ -363,8 +421,8 @@
 
         <!-- LEADERBOARD PAGE -->
         <div id="leaderboard" class="page">
-            <h2 style="text-align: center; margin-bottom: 10px;">Hall of Fame 🏆</h2>
-            <p style="text-align: center; color: #666; font-size: 0.85rem; margin-bottom: 25px;">Top referrers & Most Liked</p>
+            <h2 style="text-align: center; margin-bottom: 10px;"><span data-i18n="hall_of_fame">Hall of Fame</span> 🏆</h2>
+            <p style="text-align: center; color: #666; font-size: 0.85rem; margin-bottom: 25px;" data-i18n="top_referrers">Top referrers & Most Liked</p>
 
             <div id="lbList" class="rank-list">
                 <!-- JS Injects Ranks with Like Button -->
@@ -374,47 +432,47 @@
         <!-- WALLET PAGE -->
         <div id="wallet" class="page">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2>Wallet</h2>
+                <h2 data-i18n="wallet">Wallet</h2>
                 <button onclick="toggleHistory(true)" style="background: rgba(255,255,255,0.1); border: none; padding: 8px 12px; border-radius: 8px; color: #fff;">
-                    <i class="fas fa-history"></i> History
+                    <i class="fas fa-history"></i> <span data-i18n="history">History</span>
                 </button>
             </div>
             
-            <p style="color: #888; font-size: 0.9rem; margin-bottom: 15px;">Select Balance to Withdraw:</p>
+            <p style="color: #888; font-size: 0.9rem; margin-bottom: 15px;" data-i18n="select_balance">Select Balance to Withdraw:</p>
             
             <div class="wallet-grid">
                 <div class="w-card selected" id="cardTask" onclick="selectWallet('task')">
                     <i class="fas fa-briefcase"></i>
-                    <div style="font-size: 0.8rem; color: #888;">Task Balance</div>
-                    <div style="font-size: 1.2rem; font-weight: bold;">৳ <span id="wTaskBal">0.00</span></div>
+                    <div style="font-size: 0.8rem; color: #888;" data-i18n="task_balance">Task Balance</div>
+                    <div style="font-size: 1.2rem; font-weight: bold;"><span class="currency-symbol">৳</span> <span id="wTaskBal">0.00</span></div>
                     <i class="fas fa-check-circle check-mark"></i>
                 </div>
                 <div class="w-card" id="cardRef" onclick="selectWallet('ref')">
                     <i class="fas fa-users"></i>
-                    <div style="font-size: 0.8rem; color: #888;">Ref Balance</div>
-                    <div style="font-size: 1.2rem; font-weight: bold;">৳ <span id="wRefBal">0.00</span></div>
+                    <div style="font-size: 0.8rem; color: #888;" data-i18n="ref_balance">Ref Balance</div>
+                    <div style="font-size: 1.2rem; font-weight: bold;"><span class="currency-symbol">৳</span> <span id="wRefBal">0.00</span></div>
                     <i class="fas fa-check-circle check-mark"></i>
                 </div>
             </div>
 
             <div class="glass" style="padding: 20px; border: 1px solid var(--primary-glow);">
                 <div style="margin-bottom: 15px; font-size: 0.85rem;">
-                    Minimum: <span style="color: var(--primary); font-weight: bold;">৳ <span id="minW">50</span></span>
-                    <span style="float: right; color: #888;">Fee: 0%</span>
+                    <span data-i18n="minimum">Minimum</span>: <span style="color: var(--primary); font-weight: bold;"><span class="currency-symbol">৳</span> <span id="minW">50</span></span>
+                    <span style="float: right; color: #888;"><span data-i18n="fee">Fee</span>: 0%</span>
                 </div>
 
-                <input type="number" id="wAmount" placeholder="Amount (৳)" style="width: 100%; padding: 15px; background: #000; border: 1px solid #333; color: white; border-radius: 12px; margin-bottom: 15px; outline: none; font-family: 'Sora';">
+                <input type="number" id="wAmount" placeholder="Amount" style="width: 100%; padding: 15px; background: #000; border: 1px solid #333; color: white; border-radius: 12px; margin-bottom: 15px; outline: none; font-family: 'Sora';">
                 
-                <div class="pay-grid">
-                    <div class="pay-method selected" onclick="selectPayMethod(this, 'bkash')">Bkash</div>
-                    <div class="pay-method" onclick="selectPayMethod(this, 'nagad')">Nagad</div>
-                    <div class="pay-method" onclick="selectPayMethod(this, 'rocket')">Rocket</div>
+                <!-- UPDATED: Dynamic Payment Grid -->
+                <div class="pay-grid" id="paymentMethodContainer">
+                   <!-- Buttons will be injected here via JS -->
                 </div>
-                <input type="hidden" id="wMethod" value="bkash">
+                
+                <input type="hidden" id="wMethod" value="">
 
                 <input type="number" id="wNumber" placeholder="Mobile Number" style="width: 100%; padding: 15px; background: #000; border: 1px solid #333; color: white; border-radius: 12px; margin-bottom: 20px; outline: none; font-family: 'Sora';">
 
-                <button class="btn-main" onclick="processWithdraw()"><i class="fas fa-money-bill-wave"></i> Request Payment</button>
+                <button class="btn-main" onclick="processWithdraw()"><i class="fas fa-money-bill-wave"></i> <span data-i18n="request_payment">Request Payment</span></button>
             </div>
         </div>
 
@@ -432,14 +490,21 @@
                 <div style="color: #666; font-size: 0.8rem; margin-top: 5px;">UID: <span id="profUid">...</span> <i class="fas fa-copy" style="cursor: pointer; margin-left: 5px;" onclick="copyUID()"></i></div>
                 
                 <div style="display: flex; justify-content: center; gap: 10px; margin-top: 15px;">
-                    <span style="background: #222; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; color: var(--primary);">Level <span id="profLvl">1</span></span>
-                    <span style="background: #222; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; color: var(--success);">Verified</span>
+                    <span style="background: #222; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; color: var(--primary);"><span data-i18n="level">Level</span> <span id="profLvl">1</span></span>
+                    <span style="background: #222; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; color: var(--success);" data-i18n="verified">Verified</span>
                 </div>
             </div>
 
-            <div style="margin-bottom: 10px; color: #888; font-size: 0.9rem;">Join Channels:</div>
+            <!-- CHANGE LANGUAGE BUTTON -->
+            <div class="glass" style="padding: 15px; display:flex; align-items:center; cursor:pointer; margin-bottom: 20px; border: 1px solid #333;" onclick="openLangModal()">
+                <i class="fas fa-language" style="font-size: 1.5rem; color: var(--secondary); width: 40px;"></i>
+                <div style="flex:1; font-weight:600;" data-i18n="language_setting">Change Language / ভাষা</div>
+                <i class="fas fa-chevron-right" style="color: #666;"></i>
+            </div>
+
+            <div style="margin-bottom: 10px; color: #888; font-size: 0.9rem;" data-i18n="join_channels">Join Channels:</div>
             <div id="supportList" style="display: flex; flex-direction: column; gap: 10px;">
-                <!-- JS Injects Support Channels from Admin Panel -->
+                <!-- JS Injects Support Channels -->
             </div>
         </div>
 
@@ -450,7 +515,7 @@
     <div class="bottom-sheet" id="historySheet">
         <div class="sheet-header">
             <div class="sheet-drag"></div>
-            <h3>Transaction History</h3>
+            <h3 data-i18n="transaction_history">Transaction History</h3>
             <button onclick="toggleHistory(false)" style="position: absolute; right: 20px; top: 20px; background: none; border: none; color: #fff; font-size: 1.2rem;"><i class="fas fa-times"></i></button>
         </div>
         <div class="sheet-content" id="histList">
@@ -468,6 +533,220 @@
     </nav>
 
     <script>
+        // --- TRANSLATION DATA (5 Languages) ---
+        const translations = {
+            bn: {
+                loading: "অভিজ্ঞতা প্রস্তুত করা হচ্ছে",
+                level: "লেভেল",
+                total_balance: "মোট ব্যালেন্স",
+                referrals: "রেফারেল",
+                tasks_done: "কাজ সম্পন্ন",
+                invite_friends: "বন্ধুদের আমন্ত্রণ",
+                invite_desc: "আয় করুন",
+                invite_desc_2: "প্রতিটি বন্ধুর জন্য!",
+                share_link: "লিঙ্ক শেয়ার",
+                video_zone: "ভিডিও জোন",
+                top_rank: "সেরা র‍্যাঙ্ক",
+                earn_zone: "আর্নিং জোন",
+                daily: "দৈনিক",
+                daily_limit: "দৈনিক সীমা",
+                premium_video: "প্রিমিয়াম ভিডিও",
+                watch_desc: "পুরস্কার পেতে সম্পূর্ণ ভিডিও দেখুন (১০+ সেকেন্ড)",
+                watch_now: "এখন দেখুন",
+                active_tasks: "সক্রিয় কাজ",
+                hall_of_fame: "সেরাদের তালিকা",
+                top_referrers: "শীর্ষ রেফারি এবং সর্বাধিক পছন্দ",
+                wallet: "ওয়ালেট",
+                history: "ইতিহাস",
+                select_balance: "উত্তোলনের জন্য ব্যালেন্স নির্বাচন করুন:",
+                task_balance: "টাস্ক ব্যালেন্স",
+                ref_balance: "রেফার ব্যালেন্স",
+                minimum: "সর্বনিম্ন",
+                fee: "ফি",
+                request_payment: "পেমেন্ট অনুরোধ",
+                verified: "ভেরিফাইড",
+                join_channels: "চ্যানেলে জয়েন করুন:",
+                transaction_history: "লেনদেনের ইতিহাস",
+                language_setting: "ভাষা পরিবর্তন করুন",
+                currency_sym: "৳",
+                mobile_number: "মোবাইল নম্বর"
+            },
+            hi: {
+                loading: "अनुभव तैयार हो रहा है",
+                level: "लेवल",
+                total_balance: "कुल शेष",
+                referrals: "रेफरल",
+                tasks_done: "कार्य पूर्ण",
+                invite_friends: "दोस्तों को आमंत्रित करें",
+                invite_desc: "कमाएँ",
+                invite_desc_2: "हर दोस्त के लिए!",
+                share_link: "लिंक साझा करें",
+                video_zone: "वीडियो ज़ोन",
+                top_rank: "शीर्ष रैंक",
+                earn_zone: "कमाई क्षेत्र",
+                daily: "दैनिक",
+                daily_limit: "दैनिक सीमा",
+                premium_video: "प्रीमियम वीडियो",
+                watch_desc: "इनाम पाने के लिए पूरा वीडियो देखें (10s+)",
+                watch_now: "अभी देखें",
+                active_tasks: "सक्रिय कार्य",
+                hall_of_fame: "प्रसिद्धि हॉल",
+                top_referrers: "शीर्ष रेफरर और सर्वाधिक पसंद",
+                wallet: "वॉलेट",
+                history: "इतिहास",
+                select_balance: "निकासी के लिए शेष चुनें:",
+                task_balance: "कार्य शेष",
+                ref_balance: "रेफर शेष",
+                minimum: "न्यूनतम",
+                fee: "शुल्क",
+                request_payment: "भुगतान अनुरोध",
+                verified: "सत्यापित",
+                join_channels: "चैनलों से जुड़ें:",
+                transaction_history: "लेनदेन इतिहास",
+                language_setting: "भाषा बदलें",
+                currency_sym: "₹",
+                mobile_number: "मोबाइल नंबर"
+            },
+            en: { // USA
+                loading: "Preparing Experience",
+                level: "Level",
+                total_balance: "Total Balance",
+                referrals: "Referrals",
+                tasks_done: "Tasks Done",
+                invite_friends: "Invite Friends",
+                invite_desc: "Earn",
+                invite_desc_2: "for every friend!",
+                share_link: "Share Link",
+                video_zone: "Video Zone",
+                top_rank: "Top Rank",earn_zone: "Earn Zone",
+                daily: "Daily",
+                daily_limit: "Daily Limit",
+                premium_video: "Premium Video",
+                watch_desc: "Watch full video (10s+) to get reward.",
+                watch_now: "Watch Now",
+                active_tasks: "Active Tasks",
+                hall_of_fame: "Hall of Fame",
+                top_referrers: "Top referrers & Most Liked",
+                wallet: "Wallet",
+                history: "History",
+                select_balance: "Select Balance to Withdraw:",
+                task_balance: "Task Balance",
+                ref_balance: "Ref Balance",
+                minimum: "Minimum",
+                fee: "Fee",
+                request_payment: "Request Payment",
+                verified: "Verified",
+                join_channels: "Join Channels:",
+                transaction_history: "Transaction History",
+                language_setting: "Change Language",
+                currency_sym: "$",
+                mobile_number: "Mobile Number"
+            },
+            ms: { // Malaysia
+                loading: "Menyediakan Pengalaman",
+                level: "Tahap",
+                total_balance: "Jumlah Baki",
+                referrals: "Rujukan",
+                tasks_done: "Tugasan Selesai",
+                invite_friends: "Jemput Rakan",
+                invite_desc: "Dapatkan",
+                invite_desc_2: "untuk setiap rakan!",
+                share_link: "Kongsi Pautan",
+                video_zone: "Zon Video",
+                top_rank: "Pangkat Teratas",
+                earn_zone: "Zon Pendapatan",
+                daily: "Harian",
+                daily_limit: "Had Harian",
+                premium_video: "Video Premium",
+                watch_desc: "Tonton video penuh (10s+) untuk ganjaran.",
+                watch_now: "Tonton Sekarang",
+                active_tasks: "Tugasan Aktif",
+                hall_of_fame: "Dewan Kemasyhuran",
+                top_referrers: "Penyurung Teratas",
+                wallet: "Dompet",
+                history: "Sejarah",
+                select_balance: "Pilih Baki untuk Dikeluarkan:",
+                task_balance: "Baki Tugasan",
+                ref_balance: "Baki Rujukan",
+                minimum: "Minimum",
+                fee: "Yuran",
+                request_payment: "Minta Pembayaran",
+                verified: "Disahkan",
+                join_channels: "Sertai Saluran:",
+                transaction_history: "Sejarah Transaksi",
+                language_setting: "Tukar Bahasa",
+                currency_sym: "RM",
+                mobile_number: "Nombor Telefon"
+            },
+            ca: { // Canada
+                loading: "Preparing Experience",
+                level: "Level",
+                total_balance: "Total Balance",
+                referrals: "Referrals",
+                tasks_done: "Tasks Done",
+                invite_friends: "Invite Friends",
+                invite_desc: "Earn",
+                invite_desc_2: "for every friend!",
+                share_link: "Share Link",
+                video_zone: "Video Zone",
+                top_rank: "Top Rank",
+                earn_zone: "Earn Zone",
+                daily: "Daily",
+                daily_limit: "Daily Limit",
+                premium_video: "Premium Video",
+                watch_desc: "Watch full video (10s+) to get reward.",
+                watch_now: "Watch Now",
+                active_tasks: "Active Tasks",
+                hall_of_fame: "Hall of Fame",
+                top_referrers: "Top referrers & Most Liked",
+                wallet: "Wallet",
+                history: "History",
+                select_balance: "Select Balance to Withdraw:",
+                task_balance: "Task Balance",
+                ref_balance: "Ref Balance",
+                minimum: "Minimum",
+                fee: "Fee",
+                request_payment: "Request Payment",
+                verified: "Verified",
+                join_channels: "Join Channels:",
+                transaction_history: "Transaction History",
+                language_setting: "Change Language",
+                currency_sym: "C$",
+                mobile_number: "Mobile Number"
+            }
+        };
+
+        // --- NEW: REGIONAL PAYMENT CONFIG ---
+        const regionPaymentMethods = {
+            bn: [ // Bangladesh
+                { id: 'bkash', name: 'Bkash' },
+                { id: 'nagad', name: 'Nagad' },
+                { id: 'rocket', name: 'Rocket' }
+            ],
+            hi: [ // India
+                { id: 'upi', name: 'UPI / GPay' },
+                { id: 'paytm', name: 'Paytm' },
+                { id: 'phonepe', name: 'PhonePe' }
+            ],
+            en: [ // Global / USA
+                { id: 'paypal', name: 'PayPal' },
+                { id: 'binance', name: 'Binance (USDT)' },
+                { id: 'payeer', name: 'Payeer' }
+            ],
+            ms: [ // Malaysia
+                { id: 'tng', name: 'TNG eWallet' },
+                { id: 'grabpay', name: 'GrabPay' },
+                { id: 'duitnow', name: 'DuitNow' }
+            ],
+            ca: [ // Canada
+                { id: 'paypal', name: 'PayPal' },
+                { id: 'interac', name: 'Interac' },
+                { id: 'crypto', name: 'Crypto (LTC)' }
+            ]
+        };
+
+        let currentLang = 'bn'; // Default
+
         // --- CONFIG ---
         const CONFIG = {
             firebase: {
@@ -485,7 +764,7 @@
         };
 
         let adminConfig = {
-            monetagId: "", // Fetched from DB
+            monetagId: "", 
             supportLinks: []
         };
 
@@ -493,7 +772,7 @@
         let db, auth, userRef, currentUser;
         let userData = {};
         let selectedWallet = 'task';
-        let useGigaPub = false; // Toggle Switch for Ad Networks
+        let useGigaPub = false; 
 
         const tg = window.Telegram.WebApp;
         tg.expand();
@@ -507,26 +786,126 @@
         } catch(e) { console.error("Firebase Error", e); }
 
         window.onload = async () => {
+            // Check Language Preference
+            const savedLang = localStorage.getItem('appLang');
             const bar = document.getElementById('loadBar');
-            bar.style.width = '60%'; 
-            
-            setTimeout(async () => {
-                await loadAdminConfig(); // Fetch Admin Config first
-                bar.style.width = '80%';
-                await initApp();
-                bar.style.width = '100%';
-                
-                setTimeout(() => {
-                    document.getElementById('loader').style.opacity = '0';
-                    setTimeout(() => document.getElementById('loader').remove(), 500);
-                    setTimeout(() => {
-                        document.getElementById('skeleton-layer').style.opacity = '0';
-                        setTimeout(() => document.getElementById('skeleton-layer').remove(), 500);
-                        document.getElementById('app-content').classList.add('visible');
-                    }, 800);
-                }, 500);
-            }, 1000);
+            bar.style.width = '20%';
+
+            if(savedLang) {
+                applyLanguage(savedLang);
+                startLoadingProcess();
+            } else {
+                // Show Lang Modal immediately
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('lang-overlay').style.display = 'flex';
+            }
         };
+
+        function openLangModal() {
+            const modal = document.getElementById('lang-overlay');
+            modal.style.display = 'flex';
+            setTimeout(() => { modal.style.opacity = '1'; }, 10);
+        }
+
+        function selectLanguage(lang) {
+            localStorage.setItem('appLang', lang);
+            applyLanguage(lang);
+            
+            const modal = document.getElementById('lang-overlay');
+            modal.style.opacity = '0';
+            
+            setTimeout(() => {
+                modal.style.display = 'none';
+                // If this is the first load (loader is hidden), show loader and start
+                const loader = document.getElementById('loader');
+                if(loader.style.display === 'none' && !currentUser) {
+                    loader.style.display = 'flex';
+                    loader.style.opacity = '1';
+                    startLoadingProcess();
+                }
+            }, 500);
+        }
+
+        // --- NEW: RENDER DYNAMIC PAYMENT METHODS ---
+        function renderPaymentMethods(lang) {
+            const container = document.getElementById('paymentMethodContainer');
+            const methods = regionPaymentMethods[lang] || regionPaymentMethods['en']; // Default English
+            
+            container.innerHTML = ''; // Clear existing buttons
+
+            methods.forEach((m, index) => {
+                const div = document.createElement('div');
+                div.className = `pay-method ${index === 0 ? 'selected' : ''}`; // Auto select first
+                div.innerText = m.name;
+                div.onclick = () => selectPayMethod(div, m.id);
+                container.appendChild(div);
+
+                // Set default method for input
+                if(index === 0) {
+                    document.getElementById('wMethod').value = m.id;
+                }
+            });
+
+            // Update Input Placeholder based on region
+            const numInput = document.getElementById('wNumber');
+            if(lang === 'hi') {
+                numInput.placeholder = "Enter UPI ID / Number";
+            } else if(lang === 'en' || lang === 'ca') {
+                numInput.placeholder = "Wallet Address / Email";
+            } else {
+                numInput.placeholder = translations[lang]?.mobile_number || "Mobile Number";
+            }
+        }
+
+        function applyLanguage(lang) {
+            currentLang = lang;
+            const t = translations[lang];
+            
+            // Translate Text Elements
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if(t[key]) el.innerText = t[key];
+            });
+
+            // Translate Inputs
+            const amtInput = document.getElementById('wAmount');
+            if(amtInput) {
+                if(lang === 'bn') amtInput.placeholder = 'টাকার পরিমাণ';
+                else if(lang === 'hi') amtInput.placeholder = 'राशि';
+                else amtInput.placeholder = 'Amount';
+            }
+            
+            // --- CALL PAYMENT RENDERER ---
+            renderPaymentMethods(lang);
+            
+            // Update Currency Symbols
+            document.querySelectorAll('.currency-symbol').forEach(el => {
+                el.innerText = t.currency_sym;
+            });
+
+            // Update Dynamic Texts if data loaded
+            if(userData.uid) renderAll();
+        }
+
+        async function startLoadingProcess() {
+            const bar = document.getElementById('loadBar');
+            bar.style.width = '60%';
+            
+            await loadAdminConfig();
+            bar.style.width = '80%';
+            await initApp();
+            bar.style.width = '100%';
+            
+            setTimeout(() => {
+                document.getElementById('loader').style.opacity = '0';
+                setTimeout(() => document.getElementById('loader').remove(), 500);
+                setTimeout(() => {
+                    document.getElementById('skeleton-layer').style.opacity = '0';
+                    setTimeout(() => document.getElementById('skeleton-layer').remove(), 500);
+                    document.getElementById('app-content').classList.add('visible');
+                }, 800);
+            }, 500);
+        }
 
         // --- FETCH ADMIN CONFIG & INJECT AD SCRIPT ---
         async function loadAdminConfig() {
@@ -537,7 +916,6 @@
                     adminConfig.monetagId = data.monetagId || "";
                     adminConfig.supportLinks = data.supportLinks || [];
                     
-                    // Inject Monetag Script if ID exists (GigaPub is already in Head)
                     if(adminConfig.monetagId) {
                         const script = document.createElement('script');
                         script.src = "//libtl.com/sdk.js";
@@ -546,7 +924,6 @@
                         document.body.appendChild(script);
                     }
                 } else {
-                    // Fallback Defaults
                     adminConfig.supportLinks = [
                         { title: "Support Group", url: "https://t.me/Orange_lemon1_Bot", icon: "fab fa-telegram" }
                     ];
@@ -695,14 +1072,11 @@
         async function watchAd() {
             triggerHaptic();
             
-            // 1. Check Limits
             if((userData.adsWatched || 0) >= CONFIG.adLimit) {
                 return showToast("Daily Limit Reached", "error");
             }
 
-            // 2. Decide Network (Toggle Logic)
             if (useGigaPub) {
-                // --- SHOW GIGAPUB ---
                 if (typeof window.showGiga === 'undefined') {
                      showToast("Ad Loading... Try again in 3s", "error");
                      return;
@@ -713,16 +1087,15 @@
                 window.showGiga()
                   .then(() => {
                     completeAdReward();
-                    useGigaPub = !useGigaPub; // Switch to Monetag next
+                    useGigaPub = !useGigaPub; 
                   })
                   .catch(e => {
                     console.error("GigaPub Error:", e);
                     showToast("Video failed to load. Retrying...", "error");
-                    useGigaPub = !useGigaPub; // Switch to Monetag on fail too
+                    useGigaPub = !useGigaPub; 
                   });
             
             } else {
-                // --- SHOW MONETAG ---
                 const adFuncName = `show_${adminConfig.monetagId}`;
                 if(!adminConfig.monetagId || typeof window[adFuncName] === 'undefined') {
                     showToast("Ad Loading... Try again in 3s", "error");
@@ -737,32 +1110,32 @@
                     const endTime = Date.now();
                     const duration = endTime - startTime;
 
-                    if (duration < 5000) { // 5s Threshold for basic check
+                    if (duration < 5000) { 
                         showToast("Video too short! No reward.", "error");
                     } else {
                         completeAdReward();
                     }
-                    useGigaPub = !useGigaPub; // Switch to GigaPub next
+                    useGigaPub = !useGigaPub; 
 
                 } catch(err) {
                     console.error("Monetag Error:", err);
                     showToast("Video failed. Retrying...", "error");
-                    useGigaPub = !useGigaPub; // Switch to GigaPub on fail too
+                    useGigaPub = !useGigaPub; 
                 }
             }
         }
 
         async function completeAdReward() {
              const bonus = CONFIG.adReward;
+             const sym = translations[currentLang].currency_sym;
              
-             // Update UI Optimistically
              userData.taskBalance = (userData.taskBalance || 0) + bonus;
              userData.adsWatched = (userData.adsWatched || 0) + 1;
              updateUIBalances();
              document.getElementById('adCount').innerText = userData.adsWatched;
 
              triggerSuccess();
-             showToast(`Success! +৳${bonus} Added.`, "success");
+             showToast(`Success! +${sym}${bonus} Added.`, "success");
 
              try {
                  await userRef.update({
@@ -770,7 +1143,6 @@
                     adsWatched: firebase.firestore.FieldValue.increment(1)
                 });
              } catch(e) {
-                 // Revert if error
                  userData.taskBalance -= bonus;
                  userData.adsWatched -= 1;
                  updateUIBalances();
@@ -782,6 +1154,7 @@
         async function loadDynamicTasks() {
             const list = document.getElementById('taskList');
             list.innerHTML = '<div style="text-align:center;"><i class="fas fa-spinner fa-spin"></i></div>';
+            const sym = translations[currentLang].currency_sym;
             
             try {
                 const snap = await db.collection('tasks').where('active', '==', true).get();
@@ -802,7 +1175,7 @@
                         <div class="task-icon">${iconHtml}</div>
                         <div style="flex:1;">
                             <div style="font-weight:600; font-size: 0.9rem;">${t.title}</div>
-                            <div style="color:var(--success); font-size:0.8rem;">+৳${parseFloat(t.reward).toFixed(2)}</div>
+                            <div style="color:var(--success); font-size:0.8rem;">+${sym}${parseFloat(t.reward).toFixed(2)}</div>
                         </div>
                         <button class="task-btn btn-start" id="btn-${id}" onclick="handleTask('${id}', '${t.url}', ${t.reward})">Start</button>
                     `;
@@ -814,10 +1187,10 @@
             }
         }
 
-        // Handle Task (Simulated verification for tasks to keep it simple but safe)
         function handleTask(id, url, reward) {
             triggerHaptic();
             const btn = document.getElementById(`btn-${id}`);
+            const sym = translations[currentLang].currency_sym;
             
             if(btn.classList.contains('btn-start')) {
                 window.open(url, '_blank');
@@ -826,7 +1199,6 @@
                 btn.innerText = 'Check';
             } 
             else if(btn.classList.contains('btn-check')) {
-                // Simulate checking delay
                 btn.innerText = 'Checking...';
                 btn.disabled = true;
                 setTimeout(() => {
@@ -846,7 +1218,7 @@
                 done.push(id);
                 localStorage.setItem('doneTasks', JSON.stringify(done));
                 triggerSuccess();
-                showToast(`Rewarded +৳${reward}`, "success");
+                showToast(`Rewarded +${sym}${reward}`, "success");
                 btn.parentElement.remove();
             }
         }
@@ -920,16 +1292,16 @@
             const amount = parseFloat(document.getElementById('wAmount').value);
             const number = document.getElementById('wNumber').value;
             const method = document.getElementById('wMethod').value;
+            const sym = translations[currentLang].currency_sym;
             
             if(!amount || !number) return showToast("Please fill all fields", "error");
             const min = selectedWallet === 'task' ? CONFIG.withdraw.taskMin : CONFIG.withdraw.refMin;
-            if(amount < min) return showToast(`Minimum withdraw is ৳${min}`, "error");
+            if(amount < min) return showToast(`Minimum withdraw is ${sym}${min}`, "error");
 
             const btn = document.querySelector('#wallet .btn-main');
             btn.disabled = true; btn.innerText = "Processing...";
 
             try {
-                // Double check balance from server
                 const userSnap = await userRef.get();
                 const serverData = userSnap.data();
                 const currentBal = selectedWallet === 'task' ? serverData.taskBalance : serverData.referralBalance;
@@ -956,7 +1328,7 @@
                 console.error(e);
                 showToast(e.message || "Failed to process", "error");
             }
-            btn.disabled = false; btn.innerText = "Request Payment";
+            btn.disabled = false; btn.innerText = translations[currentLang].request_payment || "Request Payment";
         }
 
         // --- HISTORY & SUPPORT ---
@@ -984,6 +1356,7 @@
         }
         async function loadHistory() {
             const list = document.getElementById('histList');
+            const sym = translations[currentLang].currency_sym;
             list.innerHTML = '<p style="text-align:center;">Loading...</p>';
             try {
                 const snap = await db.collection('withdrawals').where('uid', '==', currentUser).orderBy('date', 'desc').limit(20).get();
@@ -996,7 +1369,7 @@
                     <div class="hist-item">
                         <div><div style="font-weight:bold; text-transform:capitalize;">${data.method} (${data.number})</div>
                         <div style="font-size:0.75rem; color:#666;">${data.source.toUpperCase()} Balance</div></div>
-                        <div style="text-align:right;"><div style="font-weight:bold;">৳ ${data.amount}</div><span class="status-pill ${statusClass}">${data.status}</span></div>
+                        <div style="text-align:right;"><div style="font-weight:bold;">${sym} ${data.amount}</div><span class="status-pill ${statusClass}">${data.status}</span></div>
                     </div>`;
                 });
                 list.innerHTML = html;
