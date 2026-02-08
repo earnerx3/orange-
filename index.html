@@ -1,0 +1,1417 @@
+<!-- START OF FILE Orange Earn - Multi-Language Global Version (UPDATED PAYMENT & BINANCE) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Orange Earn - Global Secure</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase & Telegram SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- GIGAPUB AD SCRIPT -->
+    <script src="https://ad.gigapub.tech/script?id=5411"></script>
+
+    <style>
+        :root {
+            /* --- PREMIUM PALETTE --- */
+            --bg-dark: #050505;
+            --bg-card: #121212;
+            --primary: #FF9F0A;
+            --primary-glow: rgba(255, 159, 10, 0.6);
+            --secondary: #FFD60A;
+            --accent-blue: #007AFF;
+            --success: #32D74B;
+            --danger: #FF453A;
+            --text-main: #FFFFFF;
+            --text-muted: #888888;
+            
+            --grad-gold: linear-gradient(135deg, #FFD60A, #FF9F0A);
+            --glass-bg: rgba(20, 20, 20, 0.85); 
+            --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+            --rgb-anim: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background: url('cover.png') no-repeat center center fixed;
+            background-size: cover;
+            background-color: var(--bg-dark); /* Fallback */
+            color: var(--text-main);
+            font-family: 'Sora', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- UTILS --- */
+        .glass {
+            background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: var(--glass-border); border-radius: 20px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+        .text-grad { background: var(--grad-gold); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .btn-main {
+            background: var(--grad-gold); color: #000; border: none; padding: 14px; border-radius: 14px;
+            font-weight: 700; width: 100%; cursor: pointer; box-shadow: 0 0 15px rgba(255, 159, 10, 0.4);
+            transition: 0.2s; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; gap: 8px;
+        }
+        .btn-main:active { transform: scale(0.96); box-shadow: 0 0 5px rgba(255, 159, 10, 0.4); }
+        .btn-main:disabled { filter: grayscale(1); opacity: 0.6; cursor: not-allowed; }
+
+        /* --- LANGUAGE MODAL --- */
+        #lang-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 1; transition: opacity 0.5s;
+        }
+        .lang-card {
+            background: #151515; border: 1px solid var(--primary); padding: 25px; border-radius: 25px;
+            width: 85%; max-width: 350px; text-align: center; box-shadow: 0 0 30px rgba(255, 159, 10, 0.2);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 80vh; overflow-y: auto;
+        }
+        .lang-btn {
+            background: #222; border: 1px solid #333; color: #fff; padding: 12px; margin: 8px 0;
+            width: 100%; border-radius: 12px; display: flex; align-items: center; justify-content: space-between;
+            cursor: pointer; transition: 0.3s; font-size: 1rem;
+        }
+        .lang-btn:hover, .lang-btn:active {
+            background: var(--primary); color: #000; border-color: var(--primary); transform: scale(1.02);
+        }
+
+        /* --- SKELETON LOADER --- */
+        .skeleton-box {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50;
+            background: #000; padding: 20px; display: flex; flex-direction: column; gap: 20px;
+            transition: opacity 0.5s ease;
+        }
+        .skeleton {
+            background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
+            background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 12px;
+        }
+        .sk-header { height: 60px; width: 100%; display: flex; justify-content: space-between; align-items: center; }
+        .sk-circle { width: 40px; height: 40px; border-radius: 50%; }
+        .sk-line { height: 15px; border-radius: 6px; }
+        .sk-card-lg { height: 200px; width: 100%; border-radius: 20px; }
+        .sk-card-sm { height: 100px; width: 100%; border-radius: 20px; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        /* --- PREMIUM LOADER --- */
+        #loader { 
+            position: fixed; inset: 0; background: #000; z-index: 9999; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s; 
+        }
+        .logo-container { position: relative; width: 80px; height: 80px; display: flex; justify-content: center; align-items: center; margin-bottom: 40px; }
+        .logo-pulse { font-size: 3.5rem; color: var(--primary); z-index: 2; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 0 20px var(--primary-glow)); }
+        .logo-ring {
+            position: absolute; inset: -10px; border-radius: 50%; border: 2px solid transparent; border-top-color: var(--primary);
+            animation: spin 2s linear infinite; opacity: 0.5;
+        }
+        .loading-bar-wrap { width: 200px; height: 6px; background: #1a1a1a; border-radius: 10px; overflow: hidden; position: relative; }
+        .loading-bar { width: 0%; height: 100%; background: var(--grad-gold); border-radius: 10px; box-shadow: 0 0 10px var(--primary); transition: width 0.3s ease-out; }
+        .loading-text { margin-top: 15px; color: #666; font-size: 0.75rem; letter-spacing: 3px; text-transform: uppercase; }
+
+        /* --- LAYOUT --- */
+        #app-content { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; scroll-behavior: smooth; opacity: 0; transition: opacity 0.5s; }
+        #app-content.visible { opacity: 1; }
+        #app-content::-webkit-scrollbar { display: none; }
+        .page { display: none; animation: fadeUp 0.4s ease-out; }
+        .page.active { display: block; }
+
+        /* --- HEADER & BALANCE --- */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .profile-chip { display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.6); padding: 5px 15px 5px 5px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
+        .user-av { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid var(--secondary); }
+        .balance-master { padding: 25px; position: relative; overflow: hidden; text-align: center; margin-bottom: 25px; }
+        .balance-master::after {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255, 159, 10, 0.15), transparent 60%);
+            animation: rotateBg 10s linear infinite; pointer-events: none;
+        }
+        .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .mini-stat { background: rgba(0,0,0,0.4); padding: 10px; border-radius: 12px; font-size: 0.8rem; }
+
+        /* --- RGB REFERRAL BOX --- */
+        .rgb-box { position: relative; padding: 2px; border-radius: 20px; margin-bottom: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        .rgb-box::before {
+            content: ''; position: absolute; inset: 0; border-radius: 20px; background: var(--rgb-anim); background-size: 400%;
+            animation: rgbFlow 3s linear infinite; z-index: 0;
+        }
+        .rgb-inner { background: #101010; position: relative; z-index: 1; border-radius: 18px; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+
+        /* --- PREMIUM AD ZONE --- */
+        .ad-zone-wrap { position: relative; padding: 3px; border-radius: 24px; margin-bottom: 25px; overflow: hidden; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        .ad-zone-wrap::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: conic-gradient(transparent 0deg, #ff0000 90deg, transparent 180deg, #00aaff 270deg, transparent 360deg);
+            animation: slowSpin 8s linear infinite;
+        }
+        .ad-zone { position: relative; background: #121212; border-radius: 22px; padding: 20px; text-align: center; z-index: 2; }
+
+        /* --- TASK CARD --- */
+        .task-card {
+            background: rgba(24, 24, 24, 0.9); padding: 15px; border-radius: 16px; margin-bottom: 12px;
+            display: flex; align-items: center; gap: 15px; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s;
+        }
+        .task-card:active { transform: scale(0.98); background: #202020; }
+        .task-icon { width: 45px; height: 45px; border-radius: 10px; background: #222; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--primary); overflow: hidden; }
+        .task-icon img { width: 100%; height: 100%; object-fit: cover; }
+        .task-btn { margin-left: auto; padding: 8px 16px; border-radius: 8px; font-size: 0.8rem; font-weight: bold; border: none; cursor: pointer; min-width: 80px; }
+        .btn-start { background: rgba(255,255,255,0.1); color: #fff; }
+        .btn-check { background: var(--accent-blue); color: #fff; }
+        .btn-claim { background: var(--success); color: #fff; animation: pulseBtn 1s infinite; }
+
+        /* --- WALLET --- */
+        .wallet-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .w-card {
+            padding: 20px; border-radius: 18px; border: 1px solid #333; background: rgba(22, 22, 22, 0.95); cursor: pointer;
+            transition: 0.3s; position: relative; overflow: hidden;
+        }
+        .w-card.selected { border-color: var(--primary); background: rgba(255, 159, 10, 0.05); box-shadow: 0 0 20px rgba(255, 159, 10, 0.15) inset; }
+        .w-card i { font-size: 1.5rem; margin-bottom: 10px; color: #666; transition: 0.3s; }
+        .w-card.selected i { color: var(--primary); transform: translateY(-3px); }
+        .check-mark { position: absolute; top: 10px; right: 10px; color: var(--primary); font-size: 1rem; opacity: 0; transform: scale(0); transition: 0.3s; }
+        .w-card.selected .check-mark { opacity: 1; transform: scale(1); }
+        
+        /* Updated Pay Grid for Better Layout */
+        .pay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .pay-method {
+            background: #222; padding: 12px 5px; text-align: center; border-radius: 12px; border: 1px solid #333;
+            cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; font-size: 0.85rem; color: #aaa;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .pay-method.selected {
+            background: linear-gradient(135deg, rgba(255, 159, 10, 0.2), rgba(255, 159, 10, 0.05)); border-color: var(--primary);
+            color: #fff; box-shadow: 0 0 15px rgba(255, 159, 10, 0.3); transform: translateY(-2px);
+        }
+
+        /* --- RANK & LIKES --- */
+        .rank-list { padding-bottom: 70px; } 
+        .rank-row { display: flex; align-items: center; padding: 12px; margin-bottom: 8px; background: rgba(21, 21, 21, 0.9); border-radius: 12px; border: 1px solid #222; }
+        .rank-num { font-weight: 800; font-size: 1.1rem; width: 35px; color: #555; font-style: italic; }
+        .rank-row:nth-child(1) .rank-num { color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+        .rank-row:nth-child(2) .rank-num { color: #C0C0C0; }
+        .rank-row:nth-child(3) .rank-num { color: #CD7F32; }
+        .like-btn {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            width: 45px; height: 45px; border-radius: 10px; cursor: pointer; transition: 0.2s; margin-left: 8px;
+        }
+        .like-btn.liked { background: rgba(255, 69, 58, 0.15); border-color: rgba(255, 69, 58, 0.3); }
+        .like-btn.liked i { color: #FF453A; animation: popHeart 0.4s ease; }
+
+        /* --- BOTTOM SHEET --- */
+        .bottom-sheet {
+            position: fixed; bottom: -100%; left: 0; width: 100%; height: 70vh;
+            background: #121212; border-radius: 25px 25px 0 0; z-index: 1000; transition: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            border-top: 1px solid var(--primary); box-shadow: 0 -10px 40px rgba(0,0,0,0.8); display: flex; flex-direction: column;
+        }
+        .sheet-active { bottom: 0; }
+        .sheet-header { padding: 20px; text-align: center; border-bottom: 1px solid #222; position: relative; }
+        .sheet-drag { width: 50px; height: 5px; background: #333; border-radius: 10px; margin: 0 auto 15px; }
+        .sheet-content { flex: 1; overflow-y: auto; padding: 20px; }
+        .hist-item { display: flex; justify-content: space-between; align-items: center; background: #191919; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 3px solid #333; }
+        .status-pill { padding: 4px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; }
+        .st-pending { background: rgba(255, 166, 0, 0.15); color: orange; }
+        .st-paid { background: rgba(50, 215, 75, 0.15); color: var(--success); }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 999; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .overlay.active { opacity: 1; pointer-events: all; }
+
+        /* --- NAV BAR --- */
+        .nav-bar { 
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
+            width: 90%; max-width: 400px; height: 65px; background: rgba(15, 15, 15, 0.9); backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; display: flex; justify-content: space-around; align-items: center; 
+            z-index: 100; box-shadow: 0 10px 40px rgba(0,0,0,0.8); 
+        }
+        .nav-item { color: #555; font-size: 1.3rem; position: relative; transition: 0.3s; padding: 10px; }
+        .nav-item.active { color: var(--primary); transform: translateY(-5px); }
+        .nav-item.active::after {
+            content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 5px; height: 5px;
+            background: var(--primary); border-radius: 50%; box-shadow: 0 0 10px var(--primary);
+        }
+
+        /* --- TOAST --- */
+        #toast-box { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 11000; width: 90%; max-width: 350px; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(10px); color: #fff; padding: 12px 20px; border-radius: 12px; display: flex; align-items: center; gap: 10px; border-left: 4px solid var(--primary); box-shadow: 0 5px 20px rgba(0,0,0,0.5); animation: fadeUp 0.3s forwards; }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+        @keyframes rgbFlow { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
+        @keyframes rotateBg { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes slowSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulseBtn { 0% { box-shadow: 0 0 0 0 rgba(50, 215, 75, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(50, 215, 75, 0); } 100% { box-shadow: 0 0 0 0 rgba(50, 215, 75, 0); } }
+        @keyframes popHeart { 0% { transform: scale(1); } 50% { transform: scale(1.5); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <!-- LANGUAGE SELECTION MODAL -->
+    <div id="lang-overlay" style="display:none;">
+        <div class="lang-card">
+            <i class="fas fa-globe" style="font-size: 3rem; color: var(--primary); margin-bottom: 20px;"></i>
+            <h2 style="margin-bottom: 10px; color: #fff;">Select Language</h2>
+            <p style="color: #888; margin-bottom: 25px;">Choose your region & language</p>
+            
+            <div class="lang-btn" onclick="selectLanguage('bn')">
+                <span><span style="font-size: 1.2rem;">🇧🇩</span> বাংলা (Bengali)</span>
+                <i class="fas fa-chevron-right"></i>
+            </div>
+            
+            <div class="lang-btn" onclick="selectLanguage('hi')">
+                <span><span style="font-size: 1.2rem;">🇮🇳</span> हिंदी (Hindi)</span>
+                <i class="fas fa-chevron-right"></i>
+            </div>
+            
+            <div class="lang-btn" onclick="selectLanguage('en')">
+                <span><span style="font-size: 1.2rem;">🇺🇸</span> English (USA)</span>
+                <i class="fas fa-chevron-right"></i>
+            </div>
+
+            <div class="lang-btn" onclick="selectLanguage('ms')">
+                <span><span style="font-size: 1.2rem;">🇲🇾</span> Malay (Malaysia)</span>
+                <i class="fas fa-chevron-right"></i>
+            </div>
+
+            <div class="lang-btn" onclick="selectLanguage('ca')">
+                <span><span style="font-size: 1.2rem;">🇨🇦</span> English (Canada)</span>
+                <i class="fas fa-chevron-right"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- PREMIUM LOADER -->
+    <div id="loader">
+        <div class="logo-container">
+            <i class="fas fa-lemon logo-pulse"></i>
+            <div class="logo-ring"></div>
+        </div>
+        <div class="loading-bar-wrap">
+            <div class="loading-bar" id="loadBar"></div>
+        </div>
+        <p class="loading-text" data-i18n="loading">PREPARING EXPERIENCE</p>
+    </div>
+
+    <!-- SKELETON LAYER -->
+    <div id="skeleton-layer" class="skeleton-box">
+        <div class="sk-header">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <div class="skeleton sk-circle"></div>
+                <div>
+                    <div class="skeleton sk-line" style="width: 80px; margin-bottom: 5px;"></div>
+                    <div class="skeleton sk-line" style="width: 50px;"></div>
+                </div>
+            </div>
+            <div class="skeleton sk-line" style="width: 60px; height: 30px; border-radius: 10px;"></div>
+        </div>
+        <div class="skeleton sk-card-lg"></div>
+        <div class="skeleton sk-card-sm"></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+            <div class="skeleton sk-card-sm"></div>
+            <div class="skeleton sk-card-sm"></div>
+        </div>
+    </div>
+
+    <!-- TOASTS -->
+    <div id="toast-box"></div>
+
+    <!-- APP CONTENT -->
+    <div id="app-content">
+
+        <!-- HOME PAGE -->
+        <div id="home" class="page active">
+            <div class="header">
+                <div class="profile-chip">
+                    <img src="" id="headAvatar" class="user-av">
+                    <div style="line-height: 1.1;">
+                        <div style="font-size: 0.85rem; font-weight: 700;" id="headName">Guest</div>
+                        <div style="font-size: 0.65rem; color: var(--primary);"><span data-i18n="level">LVL</span>: <span id="headLvl">1</span></div>
+                    </div>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 12px; font-size: 0.9rem;">
+                    <i class="fas fa-coins" style="color: var(--secondary); margin-right: 5px;"></i>
+                    <span id="headBal">0.00</span>
+                </div>
+            </div>
+
+            <div class="balance-master glass">
+                <p style="color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;" data-i18n="total_balance">Total Balance</p>
+                <h1 class="text-grad" style="font-size: 2.8rem; margin: 5px 0;"><span class="currency-symbol">৳</span> <span id="mainBal">0.00</span></h1>
+                
+                <div class="stats-row">
+                    <div class="mini-stat">
+                        <i class="fas fa-users" style="color: var(--primary); margin-bottom: 5px;"></i>
+                        <div style="color: #aaa;" data-i18n="referrals">Referrals</div>
+                        <div style="font-weight: bold; font-size: 1rem;" id="statRef">0</div>
+                    </div>
+                    <div class="mini-stat">
+                        <i class="fas fa-check-circle" style="color: var(--success); margin-bottom: 5px;"></i>
+                        <div style="color: #aaa;" data-i18n="tasks_done">Tasks Done</div>
+                        <div style="font-weight: bold; font-size: 1rem;" id="statTask">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RGB Referrals -->
+            <div class="rgb-box">
+                <div class="rgb-inner">
+                    <i class="fas fa-gift" style="font-size: 2.5rem; color: var(--secondary); margin-bottom: 10px; filter: drop-shadow(0 0 10px var(--primary));"></i>
+                    <h3 style="margin-bottom: 5px;" data-i18n="invite_friends">Invite Friends</h3>
+                    <p style="color: #888; font-size: 0.85rem; text-align: center; margin-bottom: 15px;">
+                        <span data-i18n="invite_desc">Earn</span> <span style="color: var(--primary); font-weight: bold;"><span class="currency-symbol">৳</span> <span id="refRate">5.00</span></span> <span data-i18n="invite_desc_2">for every friend!</span>
+                    </p>
+                    <div style="display: flex; gap: 10px; width: 100%;">
+                        <button class="btn-main" onclick="shareRef()"><i class="fas fa-paper-plane"></i> <span data-i18n="share_link">Share Link</span></button>
+                        <button class="glass" onclick="copyRef()" style="width: 50px; border: 1px solid #333; cursor: pointer; display:grid; place-items:center;"><i class="fas fa-copy"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="glass" style="padding: 20px; text-align: center; cursor: pointer;" onclick="navTo('tasks')">
+                    <i class="fas fa-play-circle" style="font-size: 2rem; color: var(--primary); margin-bottom: 10px;"></i>
+                    <h4 data-i18n="video_zone">Video Zone</h4>
+                </div>
+                <div class="glass" style="padding: 20px; text-align: center; cursor: pointer;" onclick="navTo('leaderboard')">
+                    <i class="fas fa-trophy" style="font-size: 2rem; color: var(--secondary); margin-bottom: 10px;"></i>
+                    <h4 data-i18n="top_rank">Top Rank</h4>
+                </div>
+            </div>
+        </div>
+
+        <!-- TASKS PAGE -->
+        <div id="tasks" class="page">
+            <h2 style="margin-bottom: 20px;"><span data-i18n="earn_zone">Earn Zone</span> <span style="font-size: 1rem; color: #666;">/ <span data-i18n="daily">Daily</span></span></h2>
+
+            <!-- PREMIUM ROTATING AD BORDER -->
+            <div class="ad-zone-wrap">
+                <div class="ad-zone">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 10px; color: #888;">
+                        <span data-i18n="daily_limit">Daily Limit</span>
+                        <!-- DYNAMIC LIMIT DISPLAY -->
+                        <span style="color: #fff;" id="limitDisplay"><span id="adCount">0</span>/10</span>
+                    </div>
+                    <i class="fas fa-film" style="font-size: 3rem; color: #eee; margin-bottom: 15px; text-shadow: 0 0 15px rgba(255,255,255,0.3);"></i>
+                    <h3 style="margin-bottom: 5px;" data-i18n="premium_video">Premium Video</h3>
+                    <p style="color: #888; font-size: 0.8rem; margin-bottom: 15px;" data-i18n="watch_desc">Watch full video (10s+) to get reward.</p>
+                    <button class="btn-main" id="adBtn" onclick="watchAd()">
+                        <!-- DYNAMIC BUTTON REWARD -->
+                        <i class="fas fa-play"></i> <span data-i18n="watch_now">Watch Now</span> (+<span class="currency-symbol">৳</span>2.00)
+                    </button>
+                </div>
+            </div>
+
+            <h3 style="margin-bottom: 15px; font-size: 1.1rem;" data-i18n="active_tasks">Active Tasks</h3>
+            <div id="taskList">
+                <!-- JS Will Inject Tasks (Admin Controlled) -->
+                <p style="text-align: center; color: #666; padding: 20px;">Loading Tasks...</p>
+            </div>
+        </div>
+
+        <!-- LEADERBOARD PAGE -->
+        <div id="leaderboard" class="page">
+            <h2 style="text-align: center; margin-bottom: 10px;"><span data-i18n="hall_of_fame">Hall of Fame</span> 🏆</h2>
+            <p style="text-align: center; color: #666; font-size: 0.85rem; margin-bottom: 25px;" data-i18n="top_referrers">Top referrers & Most Liked</p>
+
+            <div id="lbList" class="rank-list">
+                <!-- JS Injects Ranks with Like Button -->
+            </div>
+        </div>
+
+        <!-- WALLET PAGE -->
+        <div id="wallet" class="page">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 data-i18n="wallet">Wallet</h2>
+                <button onclick="toggleHistory(true)" style="background: rgba(255,255,255,0.1); border: none; padding: 8px 12px; border-radius: 8px; color: #fff;">
+                    <i class="fas fa-history"></i> <span data-i18n="history">History</span>
+                </button>
+            </div>
+            
+            <p style="color: #888; font-size: 0.9rem; margin-bottom: 15px;" data-i18n="select_balance">Select Balance to Withdraw:</p>
+            
+            <div class="wallet-grid">
+                <div class="w-card selected" id="cardTask" onclick="selectWallet('task')">
+                    <i class="fas fa-briefcase"></i>
+                    <div style="font-size: 0.8rem; color: #888;" data-i18n="task_balance">Task Balance</div>
+                    <div style="font-size: 1.2rem; font-weight: bold;"><span class="currency-symbol">৳</span> <span id="wTaskBal">0.00</span></div>
+                    <i class="fas fa-check-circle check-mark"></i>
+                </div>
+                <div class="w-card" id="cardRef" onclick="selectWallet('ref')">
+                    <i class="fas fa-users"></i>
+                    <div style="font-size: 0.8rem; color: #888;" data-i18n="ref_balance">Ref Balance</div>
+                    <div style="font-size: 1.2rem; font-weight: bold;"><span class="currency-symbol">৳</span> <span id="wRefBal">0.00</span></div>
+                    <i class="fas fa-check-circle check-mark"></i>
+                </div>
+            </div>
+
+            <div class="glass" style="padding: 20px; border: 1px solid var(--primary-glow);">
+                <div style="margin-bottom: 15px; font-size: 0.85rem;">
+                    <span data-i18n="minimum">Minimum</span>: <span style="color: var(--primary); font-weight: bold;"><span class="currency-symbol">৳</span> <span id="minW">50</span></span>
+                    
+                    <!-- Referral Requirement Indicator -->
+                    <div id="minRefReq" style="color: orange; font-size: 0.8rem; margin-top: 5px; display: none;">
+                        <i class="fas fa-exclamation-triangle"></i> Need <span id="minRefCount">0</span> Referrals
+                    </div>
+
+                    <span style="float: right; color: #888;"><span data-i18n="fee">Fee</span>: 0%</span>
+                </div>
+
+                <input type="number" id="wAmount" placeholder="Amount" style="width: 100%; padding: 15px; background: #000; border: 1px solid #333; color: white; border-radius: 12px; margin-bottom: 15px; outline: none; font-family: 'Sora';">
+                
+                <!-- DYNAMIC PAYMENT GRID -->
+                <div class="pay-grid">
+                    <!-- Methods will be injected by JS based on language -->
+                </div>
+                <input type="hidden" id="wMethod" value="">
+
+                <input type="number" id="wNumber" placeholder="Mobile / Account Number" style="width: 100%; padding: 15px; background: #000; border: 1px solid #333; color: white; border-radius: 12px; margin-bottom: 20px; outline: none; font-family: 'Sora';">
+
+                <button class="btn-main" onclick="processWithdraw()"><i class="fas fa-money-bill-wave"></i> <span data-i18n="request_payment">Request Payment</span></button>
+            </div>
+        </div>
+
+        <!-- PROFILE PAGE -->
+        <div id="profile" class="page">
+            <div class="glass" style="padding: 30px; text-align: center; margin-bottom: 20px; position: relative; overflow: hidden;">
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: var(--grad-gold);"></div>
+                
+                <div style="position: relative; display: inline-block;">
+                    <img src="" id="profAv" style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); padding: 3px; background: #000;">
+                    <i class="fas fa-check-circle" style="position: absolute; bottom: 5px; right: 5px; color: #007AFF; background: #fff; border-radius: 50%; font-size: 1.2rem;"></i>
+                </div>
+                
+                <h2 style="margin-top: 15px;" id="profName">User</h2>
+                <div style="color: #666; font-size: 0.8rem; margin-top: 5px;">UID: <span id="profUid">...</span> <i class="fas fa-copy" style="cursor: pointer; margin-left: 5px;" onclick="copyUID()"></i></div>
+                
+                <div style="display: flex; justify-content: center; gap: 10px; margin-top: 15px;">
+                    <span style="background: #222; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; color: var(--primary);"><span data-i18n="level">Level</span> <span id="profLvl">1</span></span>
+                    <span style="background: #222; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; color: var(--success);" data-i18n="verified">Verified</span>
+                </div>
+            </div>
+
+            <!-- CHANGE LANGUAGE BUTTON -->
+            <div class="glass" style="padding: 15px; display:flex; align-items:center; cursor:pointer; margin-bottom: 20px; border: 1px solid #333;" onclick="openLangModal()">
+                <i class="fas fa-language" style="font-size: 1.5rem; color: var(--secondary); width: 40px;"></i>
+                <div style="flex:1; font-weight:600;" data-i18n="language_setting">Change Language / ভাষা</div>
+                <i class="fas fa-chevron-right" style="color: #666;"></i>
+            </div>
+
+            <div style="margin-bottom: 10px; color: #888; font-size: 0.9rem;" data-i18n="join_channels">Join Channels:</div>
+            <div id="supportList" style="display: flex; flex-direction: column; gap: 10px;">
+                <!-- JS Injects Support Channels -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- HISTORY SHEET -->
+    <div class="overlay" id="sheetOverlay" onclick="toggleHistory(false)"></div>
+    <div class="bottom-sheet" id="historySheet">
+        <div class="sheet-header">
+            <div class="sheet-drag"></div>
+            <h3 data-i18n="transaction_history">Transaction History</h3>
+            <button onclick="toggleHistory(false)" style="position: absolute; right: 20px; top: 20px; background: none; border: none; color: #fff; font-size: 1.2rem;"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="sheet-content" id="histList">
+            <!-- Items injected here -->
+        </div>
+    </div>
+
+    <!-- NAV BAR -->
+    <nav class="nav-bar">
+        <div class="nav-item active" onclick="navTo('home', this)"><i class="fas fa-home"></i></div>
+        <div class="nav-item" onclick="navTo('tasks', this)"><i class="fas fa-tasks"></i></div>
+        <div class="nav-item" onclick="navTo('leaderboard', this)"><i class="fas fa-chart-bar"></i></div>
+        <div class="nav-item" onclick="navTo('wallet', this)"><i class="fas fa-wallet"></i></div>
+        <div class="nav-item" onclick="navTo('profile', this)"><i class="fas fa-user-astronaut"></i></div>
+    </nav>
+
+    <script>
+        // --- TRANSLATION DATA (5 Languages) ---
+        const translations = {
+            bn: {
+                loading: "অভিজ্ঞতা প্রস্তুত করা হচ্ছে",
+                level: "লেভেল",
+                total_balance: "মোট ব্যালেন্স",
+                referrals: "রেফারেল",
+                tasks_done: "কাজ সম্পন্ন",
+                invite_friends: "বন্ধুদের আমন্ত্রণ",
+                invite_desc: "আয় করুন",
+                invite_desc_2: "প্রতিটি বন্ধুর জন্য!",
+                share_link: "লিঙ্ক শেয়ার",
+                video_zone: "ভিডিও জোন",
+                top_rank: "সেরা র‍্যাঙ্ক",
+                earn_zone: "আর্নিং জোন",
+                daily: "দৈনিক",
+                daily_limit: "দৈনিক সীমা",
+                premium_video: "প্রিমিয়াম ভিডিও",
+                watch_desc: "পুরস্কার পেতে সম্পূর্ণ ভিডিও দেখুন (১০+ সেকেন্ড)",
+                watch_now: "এখন দেখুন",
+                active_tasks: "সক্রিয় কাজ",
+                hall_of_fame: "সেরাদের তালিকা",
+                top_referrers: "শীর্ষ রেফারি এবং সর্বাধিক পছন্দ",
+                wallet: "ওয়ালেট",
+                history: "ইতিহাস",
+                select_balance: "উত্তোলনের জন্য ব্যালেন্স নির্বাচন করুন:",
+                task_balance: "টাস্ক ব্যালেন্স",
+                ref_balance: "রেফার ব্যালেন্স",
+                minimum: "সর্বনিম্ন",
+                fee: "ফি",
+                request_payment: "পেমেন্ট অনুরোধ",
+                verified: "ভেরিফাইড",
+                join_channels: "চ্যানেলে জয়েন করুন:",
+                transaction_history: "লেনদেনের ইতিহাস",
+                language_setting: "ভাষা পরিবর্তন করুন",
+                currency_sym: "৳",
+                withdraw_ref_limit: "উইথড্র করতে আপনার আরও রেফারেল প্রয়োজন: "
+            },
+            hi: {
+                loading: "अनुभव तैयार हो रहा है",
+                level: "लेवल",
+                total_balance: "कुल शेष",
+                referrals: "रेफरल",
+                tasks_done: "कार्य पूर्ण",
+                invite_friends: "दोस्तों को आमंत्रित करें",
+                invite_desc: "कमाएँ",
+                invite_desc_2: "हर दोस्त के लिए!",
+                share_link: "लिंक साझा करें",
+                video_zone: "वीडियो ज़ोन",
+                top_rank: "शीर्ष रैंक",
+                earn_zone: "कमाई क्षेत्र",
+                daily: "दैनिक",
+                daily_limit: "दैनिक सीमा",
+                premium_video: "प्रीमियम वीडियो",
+                watch_desc: "इनाम पाने के लिए पूरा वीडियो देखें (10s+)",
+                watch_now: "अभी देखें",
+                active_tasks: "सक्रिय कार्य",
+                hall_of_fame: "प्रसिद्धि हॉल",
+                top_referrers: "शीर्ष रेफरर और सर्वाधिक पसंद",
+                wallet: "वॉलेट",
+                history: "इतिहास",
+                select_balance: "निकासी के लिए शेष चुनें:",
+                task_balance: "कार्य शेष",
+                ref_balance: "रेफर शेष",
+                minimum: "न्यूनतम",
+                fee: "शुल्क",
+                request_payment: "भुगतान अनुरोध",
+                verified: "सत्यापित",
+                join_channels: "चैनलों से जुड़ें:",
+                transaction_history: "लेनदेन इतिहास",
+                language_setting: "भाषा बदलें",
+                currency_sym: "₹",
+                withdraw_ref_limit: "निकासी के लिए आवश्यक और रेफरल: "
+            },
+            en: { // USA
+                loading: "Preparing Experience",
+                level: "Level",
+                total_balance: "Total Balance",
+                referrals: "Referrals",
+                tasks_done: "Tasks Done",
+                invite_friends: "Invite Friends",
+                invite_desc: "Earn",
+                invite_desc_2: "for every friend!",
+                share_link: "Share Link",
+                video_zone: "Video Zone",
+                top_rank: "Top Rank",earn_zone: "Earn Zone",
+                daily: "Daily",
+                daily_limit: "Daily Limit",
+                premium_video: "Premium Video",
+                watch_desc: "Watch full video (10s+) to get reward.",
+                watch_now: "Watch Now",
+                active_tasks: "Active Tasks",
+                hall_of_fame: "Hall of Fame",
+                top_referrers: "Top referrers & Most Liked",
+                wallet: "Wallet",
+                history: "History",
+                select_balance: "Select Balance to Withdraw:",
+                task_balance: "Task Balance",
+                ref_balance: "Ref Balance",
+                minimum: "Minimum",
+                fee: "Fee",
+                request_payment: "Request Payment",
+                verified: "Verified",
+                join_channels: "Join Channels:",
+                transaction_history: "Transaction History",
+                language_setting: "Change Language",
+                currency_sym: "$",
+                withdraw_ref_limit: "Minimum referrals required to withdraw: "
+            },
+            ms: { // Malaysia
+                loading: "Menyediakan Pengalaman",
+                level: "Tahap",
+                total_balance: "Jumlah Baki",
+                referrals: "Rujukan",
+                tasks_done: "Tugasan Selesai",
+                invite_friends: "Jemput Rakan",
+                invite_desc: "Dapatkan",
+                invite_desc_2: "untuk setiap rakan!",
+                share_link: "Kongsi Pautan",
+                video_zone: "Zon Video",
+                top_rank: "Pangkat Teratas",
+                earn_zone: "Zon Pendapatan",
+                daily: "Harian",
+                daily_limit: "Had Harian",
+                premium_video: "Video Premium",
+                watch_desc: "Tonton video penuh (10s+) untuk ganjaran.",
+                watch_now: "Tonton Sekarang",
+                active_tasks: "Tugasan Aktif",
+                hall_of_fame: "Dewan Kemasyhuran",
+                top_referrers: "Penyurung Teratas",
+                wallet: "Dompet",
+                history: "Sejarah",
+                select_balance: "Pilih Baki untuk Dikeluarkan:",
+                task_balance: "Baki Tugasan",
+                ref_balance: "Baki Rujukan",
+                minimum: "Minimum",
+                fee: "Yuran",
+                request_payment: "Minta Pembayaran",
+                verified: "Disahkan",
+                join_channels: "Sertai Saluran:",
+                transaction_history: "Sejarah Transaksi",
+                language_setting: "Tukar Bahasa",
+                currency_sym: "RM",
+                withdraw_ref_limit: "Rujukan minimum diperlukan: "
+            },
+            ca: { // Canada
+                loading: "Preparing Experience",
+                level: "Level",
+                total_balance: "Total Balance",
+                referrals: "Referrals",
+                tasks_done: "Tasks Done",
+                invite_friends: "Invite Friends",
+                invite_desc: "Earn",
+                invite_desc_2: "for every friend!",
+                share_link: "Share Link",
+                video_zone: "Video Zone",
+                top_rank: "Top Rank",
+                earn_zone: "Earn Zone",
+                daily: "Daily",
+                daily_limit: "Daily Limit",
+                premium_video: "Premium Video",
+                watch_desc: "Watch full video (10s+) to get reward.",
+                watch_now: "Watch Now",
+                active_tasks: "Active Tasks",
+                hall_of_fame: "Hall of Fame",
+                top_referrers: "Top referrers & Most Liked",
+                wallet: "Wallet",
+                history: "History",
+                select_balance: "Select Balance to Withdraw:",
+                task_balance: "Task Balance",
+                ref_balance: "Ref Balance",
+                minimum: "Minimum",
+                fee: "Fee",
+                request_payment: "Request Payment",
+                verified: "Verified",
+                join_channels: "Join Channels:",
+                transaction_history: "Transaction History",
+                language_setting: "Change Language",
+                currency_sym: "C$",
+                withdraw_ref_limit: "Minimum referrals required: "
+            }
+        };
+
+        // --- DYNAMIC PAYMENT METHODS CONFIG ---
+        const paymentMethods = {
+            bn: ['Bkash', 'Nagad', 'Rocket'],
+            hi: ['Paytm', 'UPI', 'PhonePe'],
+            en: ['PayPal', 'CashApp', 'Venmo'], // USA
+            ms: ['TNG eWallet', 'DuitNow'], // Malaysia
+            ca: ['Interac', 'PayPal'] // Canada
+        };
+
+        let currentLang = 'bn'; // Default
+
+        // --- CONFIG ---
+        const CONFIG = {
+            firebase: {
+                apiKey: "AIzaSyAUiSqhQWYVEAUBoYxSgNBUpvJ-EHg6XcQ",
+                authDomain: "orang-f4d54.firebaseapp.com",
+                projectId: "orang-f4d54",
+                storageBucket: "orang-f4d54.firebasestorage.app",
+                messagingSenderId: "232815978701",
+                appId: "1:232815978701:web:39980778d5d2185c58a184"
+            },
+            botUsername: "Orange_lemon1_Bot",
+            adReward: 2.00,       
+            referralReward: 5.00, 
+            adLimit: 10,          
+            withdraw: { 
+                taskMin: 50, 
+                refMin: 100,
+                minReferrals: 0 
+            }
+        };
+
+        let adminConfig = {
+            monetagId: "", 
+            supportLinks: []
+        };
+
+        // --- INIT ---
+        let db, auth, userRef, currentUser;
+        let userData = {};
+        let selectedWallet = 'task';
+        let useGigaPub = false; 
+
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.setHeaderColor('#050505');
+
+        try {
+            firebase.initializeApp(CONFIG.firebase);
+            db = firebase.firestore();
+            auth = firebase.auth();
+            db.enablePersistence().catch(err => console.log(err));
+        } catch(e) { console.error("Firebase Error", e); }
+
+        window.onload = async () => {
+            // Check Language Preference
+            const savedLang = localStorage.getItem('appLang');
+            const bar = document.getElementById('loadBar');
+            bar.style.width = '20%';
+
+            if(savedLang) {
+                applyLanguage(savedLang);
+                startLoadingProcess();
+            } else {
+                // Show Lang Modal immediately
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('lang-overlay').style.display = 'flex';
+            }
+        };
+
+        function openLangModal() {
+            const modal = document.getElementById('lang-overlay');
+            modal.style.display = 'flex';
+            setTimeout(() => { modal.style.opacity = '1'; }, 10);
+        }
+
+        function selectLanguage(lang) {
+            localStorage.setItem('appLang', lang);
+            applyLanguage(lang);
+            
+            const modal = document.getElementById('lang-overlay');
+            modal.style.opacity = '0';
+            
+            setTimeout(() => {
+                modal.style.display = 'none';
+                const loader = document.getElementById('loader');
+                if(loader.style.display === 'none' && !currentUser) {
+                    loader.style.display = 'flex';
+                    loader.style.opacity = '1';
+                    startLoadingProcess();
+                }
+            }, 500);
+        }
+
+        function applyLanguage(lang) {
+            currentLang = lang;
+            const t = translations[lang];
+            
+            // Translate Text Elements
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if(t[key]) el.innerText = t[key];
+            });
+
+            // Translate Inputs
+            const amtInput = document.getElementById('wAmount');
+            if(amtInput) {
+                if(lang === 'bn') amtInput.placeholder = 'টাকার পরিমাণ';
+                else if(lang === 'hi') amtInput.placeholder = 'राशि';
+                else amtInput.placeholder = 'Amount';
+            }
+            
+            const numInput = document.getElementById('wNumber');
+            if(numInput) {
+                if(lang === 'bn') numInput.placeholder = 'মোবাইল নম্বর';
+                else if(lang === 'hi') numInput.placeholder = 'मोबाइल नंबर';
+                else numInput.placeholder = 'Mobile / Account Number';
+            }
+
+            // Update Currency Symbols
+            document.querySelectorAll('.currency-symbol').forEach(el => {
+                el.innerText = t.currency_sym;
+            });
+
+            // --- NEW: INJECT DYNAMIC PAYMENT METHODS + BINANCE ---
+            const payGrid = document.querySelector('.pay-grid');
+            if(payGrid) {
+                payGrid.innerHTML = ''; // Clear existing
+                const localMethods = paymentMethods[lang] || paymentMethods['en'];
+                
+                // Add Binance to the list for ALL countries
+                const allMethods = [...localMethods, 'Binance'];
+
+                allMethods.forEach((method, index) => {
+                    const div = document.createElement('div');
+                    // Select first method by default
+                    div.className = `pay-method ${index === 0 ? 'selected' : ''}`;
+                    div.innerText = method;
+                    div.onclick = () => selectPayMethod(div, method.toLowerCase().replace(/\s/g, '')); // normalize method id
+                    payGrid.appendChild(div);
+
+                    // Set default hidden input value
+                    if(index === 0) {
+                        document.getElementById('wMethod').value = method.toLowerCase().replace(/\s/g, '');
+                    }
+                });
+            }
+
+            // Update Dynamic Texts if data loaded
+            if(userData.uid) renderAll();
+        }
+
+        async function startLoadingProcess() {
+            const bar = document.getElementById('loadBar');
+            bar.style.width = '60%';
+            
+            await loadAdminConfig();
+            bar.style.width = '80%';
+            await initApp();
+            bar.style.width = '100%';
+            
+            setTimeout(() => {
+                document.getElementById('loader').style.opacity = '0';
+                setTimeout(() => document.getElementById('loader').remove(), 500);
+                setTimeout(() => {
+                    document.getElementById('skeleton-layer').style.opacity = '0';
+                    setTimeout(() => document.getElementById('skeleton-layer').remove(), 500);
+                    document.getElementById('app-content').classList.add('visible');
+                }, 800);
+            }, 500);
+        }
+
+        async function loadAdminConfig() {
+            try {
+                const doc = await db.collection('settings').doc('appConfig').get();
+                if(doc.exists) {
+                    const data = doc.data();
+                    
+                    if(data.adReward !== undefined) CONFIG.adReward = Number(data.adReward);
+                    if(data.referralReward !== undefined) CONFIG.referralReward = Number(data.referralReward);
+                    if(data.dailyAdLimit !== undefined) CONFIG.adLimit = Number(data.dailyAdLimit);
+
+                    adminConfig.monetagId = data.monetagId || "";
+                    adminConfig.supportLinks = data.supportLinks || [];
+                    
+                    if(data.withdrawConfig) {
+                        CONFIG.withdraw.taskMin = Number(data.withdrawConfig.taskMin) || 50;
+                        CONFIG.withdraw.refMin = Number(data.withdrawConfig.refMin) || 100;
+                        CONFIG.withdraw.minReferrals = Number(data.withdrawConfig.minReferrals) || 0;
+                        
+                        if(data.withdrawConfig.fee) {
+                            const feeSpan = document.querySelector('[data-i18n="fee"]');
+                            if(feeSpan) feeSpan.innerText = `Fee: ${data.withdrawConfig.fee}%`;
+                        }
+                    }
+                    
+                    if(adminConfig.monetagId) {
+                        const script = document.createElement('script');
+                        script.src = "//libtl.com/sdk.js";
+                        script.setAttribute('data-zone', adminConfig.monetagId);
+                        script.setAttribute('data-sdk', `show_${adminConfig.monetagId}`);
+                        document.body.appendChild(script);
+                    }
+                } else {
+                    adminConfig.supportLinks = [
+                        { title: "Support Group", url: "https://t.me/Orange_lemon1_Bot", icon: "fab fa-telegram" }
+                    ];
+                }
+            } catch(e) {
+                console.log("Config Load Error", e);
+            }
+        }
+
+        async function initApp() {
+            try {
+                let uid, name, photo, startParam;
+                if(tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                    const u = tg.initDataUnsafe.user;
+                    uid = u.id.toString();
+                    name = u.first_name;
+                    photo = u.photo_url;
+                    startParam = tg.initDataUnsafe.start_param;
+                } else {
+                    const cred = await auth.signInAnonymously();
+                    uid = cred.user.uid;
+                    name = "User " + uid.substr(0,4);
+                    photo = "https://ui-avatars.com/api/?background=random&name=D";
+                }
+                
+                currentUser = uid;
+                userRef = db.collection('users').doc(uid);
+                
+                const snap = await userRef.get();
+                if(!snap.exists) {
+                    const newUser = {
+                        uid, name, photo: photo || `https://ui-avatars.com/api/?background=random&name=${name}`,
+                        taskBalance: 0, referralBalance: 0, referralCount: 0,
+                        tasksDone: 0, adsWatched: 0, likes: 0, 
+                        adDate: new Date().toDateString(),
+                        joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    
+                    if(startParam && startParam.startsWith('ref_')) {
+                        const refId = startParam.replace('ref_', '');
+                        if(refId !== uid) { 
+                            const refUserSnap = await db.collection('users').doc(refId).get();
+                            if(refUserSnap.exists) {
+                                newUser.referredBy = refId;
+                                db.collection('users').doc(refId).update({
+                                    referralCount: firebase.firestore.FieldValue.increment(1),
+                                    referralBalance: firebase.firestore.FieldValue.increment(CONFIG.referralReward)
+                                });
+                            }
+                        }
+                    }
+                    await userRef.set(newUser);
+                    userData = newUser;
+                } else {
+                    userData = snap.data();
+                    if(name && userData.name !== name) userRef.update({ name });
+                    if(photo && userData.photo !== photo) userRef.update({ photo });
+                    
+                    const today = new Date().toDateString();
+                    if(userData.adDate !== today) {
+                        userRef.update({ adsWatched: 0, adDate: today });
+                        userData.adsWatched = 0;
+                    }
+                }
+
+                userRef.onSnapshot((doc) => {
+                    if(doc.exists) {
+                        userData = doc.data();
+                        updateUIBalances();
+                        document.getElementById('statTask').innerText = (userData.adsWatched || 0) + (userData.tasksDone || 0);
+                        document.getElementById('adCount').innerText = userData.adsWatched || 0;
+                    }
+                });
+
+                renderAll();
+            } catch(e) {
+                console.error(e);
+                showToast("Connection Error", "error");
+            }
+        }
+
+        function renderAll() {
+            document.getElementById('headName').innerText = userData.name;
+            document.getElementById('headAvatar').src = userData.photo;
+            document.getElementById('headLvl').innerText = getLevel(userData.referralCount);
+            
+            updateUIBalances();
+            
+            document.getElementById('statRef').innerText = userData.referralCount || 0;
+            document.getElementById('statTask').innerText = (userData.adsWatched || 0) + (userData.tasksDone || 0);
+            
+            document.getElementById('limitDisplay').innerHTML = `<span id="adCount">${userData.adsWatched || 0}</span>/${CONFIG.adLimit}`;
+            
+            document.getElementById('profName').innerText = userData.name;
+            document.getElementById('profAv').src = userData.photo;
+            document.getElementById('profUid').innerText = userData.uid;
+            document.getElementById('profLvl').innerText = getLevel(userData.referralCount);
+            document.getElementById('profAv').style.borderColor = getLevelColor(userData.referralCount);
+            
+            loadDynamicTasks();
+            renderSupportChannels();
+            
+            document.getElementById('refRate').innerText = CONFIG.referralReward.toFixed(2);
+
+            const sym = translations[currentLang].currency_sym;
+            const watchText = translations[currentLang].watch_now;
+            document.getElementById('adBtn').innerHTML = 
+                `<i class="fas fa-play"></i> ${watchText} (+${sym}${CONFIG.adReward.toFixed(2)})`;
+            
+            if(CONFIG.withdraw.minReferrals > 0) {
+                 document.getElementById('minRefReq').style.display = 'block';
+                 document.getElementById('minRefCount').innerText = CONFIG.withdraw.minReferrals;
+            }
+        }
+
+        function updateUIBalances() {
+            const total = ((userData.taskBalance || 0) + (userData.referralBalance || 0)).toFixed(2);
+            document.getElementById('headBal').innerText = total;
+            document.getElementById('mainBal').innerText = total;
+            document.getElementById('wTaskBal').innerText = (userData.taskBalance || 0).toFixed(2);
+            document.getElementById('wRefBal').innerText = (userData.referralBalance || 0).toFixed(2);
+        }
+
+        function getLevel(refs) {
+            if(!refs) return 1;
+            if(refs > 100) return 10;
+            if(refs > 50) return 5;
+            if(refs > 20) return 3;
+            return 1;
+        }
+
+        function getLevelColor(refs) {
+            if(!refs) return '#FF9F0A';
+            if(refs > 50) return '#C0C0C0';
+            if(refs > 100) return '#FFD700';
+            return '#FF9F0A';
+        }
+
+        function triggerHaptic() { if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium'); }
+        function triggerSuccess() { 
+            if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success'); 
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        }
+
+        function navTo(pageId, el) {
+            triggerHaptic();
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            if(el) {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                el.classList.add('active');
+            }
+            if(pageId === 'leaderboard') loadLeaderboard();
+        }
+
+        async function watchAd() {
+            triggerHaptic();
+            
+            if((userData.adsWatched || 0) >= CONFIG.adLimit) {
+                return showToast("Daily Limit Reached", "error");
+            }
+
+            if (useGigaPub) {
+                if (typeof window.showGiga === 'undefined') {
+                     showToast("Ad Loading... Try again in 3s", "error");
+                     return;
+                }
+                
+                showToast("Loading Video... (G)", "info");
+                
+                window.showGiga()
+                  .then(() => {
+                    completeAdReward();
+                    useGigaPub = !useGigaPub; 
+                  })
+                  .catch(e => {
+                    console.error("GigaPub Error:", e);
+                    showToast("Video failed to load. Retrying...", "error");
+                    useGigaPub = !useGigaPub; 
+                  });
+            
+            } else {
+                const adFuncName = `show_${adminConfig.monetagId}`;
+                if(!adminConfig.monetagId || typeof window[adFuncName] === 'undefined') {
+                    showToast("Ad Loading... Try again in 3s", "error");
+                    return;
+                }
+
+                const startTime = Date.now();
+                showToast("Loading Video... (M)", "info");
+                
+                try {
+                    await window[adFuncName]();
+                    const endTime = Date.now();
+                    const duration = endTime - startTime;
+
+                    if (duration < 5000) { 
+                        showToast("Video too short! No reward.", "error");
+                    } else {
+                        completeAdReward();
+                    }
+                    useGigaPub = !useGigaPub; 
+
+                } catch(err) {
+                    console.error("Monetag Error:", err);
+                    showToast("Video failed. Retrying...", "error");
+                    useGigaPub = !useGigaPub; 
+                }
+            }
+        }
+
+        async function completeAdReward() {
+             const bonus = CONFIG.adReward;
+             const sym = translations[currentLang].currency_sym;
+             
+             userData.taskBalance = (userData.taskBalance || 0) + bonus;
+             userData.adsWatched = (userData.adsWatched || 0) + 1;
+             updateUIBalances();
+             document.getElementById('adCount').innerText = userData.adsWatched;
+
+             triggerSuccess();
+             showToast(`Success! +${sym}${bonus.toFixed(2)} Added.`, "success");
+
+             try {
+                 await userRef.update({
+                    taskBalance: firebase.firestore.FieldValue.increment(bonus),
+                    adsWatched: firebase.firestore.FieldValue.increment(1)
+                });
+             } catch(e) {
+                 userData.taskBalance -= bonus;
+                 userData.adsWatched -= 1;
+                 updateUIBalances();
+                 showToast("Network Error: Balance reverted", "error");
+             }
+        }
+
+        async function loadDynamicTasks() {
+            const list = document.getElementById('taskList');
+            list.innerHTML = '<div style="text-align:center;"><i class="fas fa-spinner fa-spin"></i></div>';
+            const sym = translations[currentLang].currency_sym;
+            
+            try {
+                const snap = await db.collection('tasks').where('active', '==', true).get();
+                const doneTasks = JSON.parse(localStorage.getItem('doneTasks') || '[]');
+                list.innerHTML = '';
+                if(snap.empty) {
+                    list.innerHTML = '<p style="text-align:center;color:#666;">No active tasks</p>';
+                    return;
+                }
+                snap.forEach(doc => {
+                    const t = doc.data();
+                    const id = doc.id;
+                    if(doneTasks.includes(id)) return;
+                    const div = document.createElement('div');
+                    div.className = 'task-card';
+                    const iconHtml = t.icon.startsWith('http') ? `<img src="${t.icon}">` : `<i class="${t.icon}"></i>`;
+                    div.innerHTML = `
+                        <div class="task-icon">${iconHtml}</div>
+                        <div style="flex:1;">
+                            <div style="font-weight:600; font-size: 0.9rem;">${t.title}</div>
+                            <div style="color:var(--success); font-size:0.8rem;">+${sym}${parseFloat(t.reward).toFixed(2)}</div>
+                        </div>
+                        <button class="task-btn btn-start" id="btn-${id}" onclick="handleTask('${id}', '${t.url}', ${t.reward})">Start</button>
+                    `;
+                    list.appendChild(div);
+                });
+            } catch(e) {
+                console.error(e);
+                list.innerHTML = '<p style="text-align:center;color:red;">Failed to load tasks</p>';
+            }
+        }
+
+        function handleTask(id, url, reward) {
+            triggerHaptic();
+            const btn = document.getElementById(`btn-${id}`);
+            const sym = translations[currentLang].currency_sym;
+            
+            if(btn.classList.contains('btn-start')) {
+                window.open(url, '_blank');
+                btn.classList.remove('btn-start');
+                btn.classList.add('btn-check');
+                btn.innerText = 'Check';
+            } 
+            else if(btn.classList.contains('btn-check')) {
+                btn.innerText = 'Checking...';
+                btn.disabled = true;
+                setTimeout(() => {
+                    btn.classList.remove('btn-check');
+                    btn.classList.add('btn-claim');
+                    btn.innerText = 'Claim';
+                    btn.disabled = false;
+                    showToast("Verified! Click Claim.", "success");
+                }, 3000);
+            } 
+            else if(btn.classList.contains('btn-claim')) {
+                userRef.update({
+                    taskBalance: firebase.firestore.FieldValue.increment(parseFloat(reward)),
+                    tasksDone: firebase.firestore.FieldValue.increment(1)
+                });
+                const done = JSON.parse(localStorage.getItem('doneTasks') || '[]');
+                done.push(id);
+                localStorage.setItem('doneTasks', JSON.stringify(done));
+                triggerSuccess();
+                showToast(`Rewarded +${sym}${reward}`, "success");
+                btn.parentElement.remove();
+            }
+        }
+
+        async function loadLeaderboard() {
+            const list = document.getElementById('lbList');
+            list.innerHTML = '<div style="text-align:center; padding:20px;">Loading...</div>';
+            try {
+                const snap = await db.collection('users').orderBy('referralCount', 'desc').limit(20).get();
+                let html = '';
+                snap.forEach((doc, i) => {
+                    const u = doc.data();
+                    const isMe = u.uid === currentUser;
+                    const likedByMe = localStorage.getItem(`liked_${u.uid}`) === 'true';
+                    html += `
+                    <div class="rank-row">
+                        <div class="rank-num">#${i + 1}</div>
+                        <img src="${u.photo}" style="width:35px; height:35px; border-radius:50%; margin-right:10px; object-fit:cover;">
+                        <div style="flex:1;">
+                            <div style="font-weight:600; font-size:0.9rem;">${u.name.split(' ')[0]} ${isMe ? '(You)' : ''}</div>
+                            <div style="font-size:0.7rem; color:#666;">${u.referralCount} Refs</div>
+                        </div>
+                        <div class="like-btn ${likedByMe ? 'liked' : ''}" onclick="toggleLike('${u.uid}', this)">
+                            <i class="${likedByMe ? 'fas' : 'far'} fa-heart"></i>
+                            <span id="like-count-${u.uid}">${u.likes || 0}</span>
+                        </div>
+                    </div>`;
+                });
+                list.innerHTML = html;
+            } catch(e) { console.error(e); }
+        }
+
+        function toggleLike(targetUid, btn) {
+            triggerHaptic();
+            if(targetUid === currentUser) return showToast("Can't like yourself!", "error");
+            const storageKey = `liked_${targetUid}`;
+            if(localStorage.getItem(storageKey) === 'true') return showToast("Already Liked!", "error");
+            
+            btn.classList.add('liked');
+            btn.querySelector('i').classList.remove('far');
+            btn.querySelector('i').classList.add('fas');
+            const countSpan = document.getElementById(`like-count-${targetUid}`);
+            countSpan.innerText = parseInt(countSpan.innerText) + 1;
+            
+            db.collection('users').doc(targetUid).update({ likes: firebase.firestore.FieldValue.increment(1) });
+            localStorage.setItem(storageKey, 'true');
+        }
+
+        function selectPayMethod(el, method) {
+            triggerHaptic();
+            document.querySelectorAll('.pay-method').forEach(i => i.classList.remove('selected'));
+            el.classList.add('selected');
+            document.getElementById('wMethod').value = method;
+        }
+
+        function selectWallet(type) {
+            triggerHaptic();
+            selectedWallet = type;
+            document.querySelectorAll('.w-card').forEach(c => c.classList.remove('selected'));
+            if(type === 'task') {
+                document.getElementById('cardTask').classList.add('selected');
+                document.getElementById('minW').innerText = CONFIG.withdraw.taskMin;
+            } else {
+                document.getElementById('cardRef').classList.add('selected');
+                document.getElementById('minW').innerText = CONFIG.withdraw.refMin;
+            }
+        }
+
+        async function processWithdraw() {
+            triggerHaptic();
+            
+            const requiredRefs = CONFIG.withdraw.minReferrals || 0;
+            const currentRefs = userData.referralCount || 0;
+            
+            if(currentRefs < requiredRefs) {
+                const msg = translations[currentLang].withdraw_ref_limit || "Minimum referrals required: ";
+                return showToast(`${msg}${requiredRefs}`, "error");
+            }
+
+            const amount = parseFloat(document.getElementById('wAmount').value);
+            const number = document.getElementById('wNumber').value;
+            const method = document.getElementById('wMethod').value;
+            const sym = translations[currentLang].currency_sym;
+            
+            if(!amount || !number || !method) return showToast("Please fill all fields", "error");
+            const min = selectedWallet === 'task' ? CONFIG.withdraw.taskMin : CONFIG.withdraw.refMin;
+            if(amount < min) return showToast(`Minimum withdraw is ${sym}${min}`, "error");
+
+            const btn = document.querySelector('#wallet .btn-main');
+            btn.disabled = true; btn.innerText = "Processing...";
+
+            try {
+                const userSnap = await userRef.get();
+                const serverData = userSnap.data();
+                const currentBal = selectedWallet === 'task' ? serverData.taskBalance : serverData.referralBalance;
+                
+                if(amount > currentBal) throw new Error("Insufficient Balance");
+
+                const batch = db.batch();
+                const wRef = db.collection('withdrawals').doc();
+                batch.set(wRef, {
+                    uid: currentUser, amount, method, number, source: selectedWallet,
+                    status: 'pending', date: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                const updateData = selectedWallet === 'task' 
+                    ? { taskBalance: firebase.firestore.FieldValue.increment(-amount) }
+                    : { referralBalance: firebase.firestore.FieldValue.increment(-amount) };
+                batch.update(userRef, updateData);
+                await batch.commit();
+                
+                triggerSuccess();
+                showToast("Withdraw Request Sent!", "success");
+                document.getElementById('wAmount').value = "";
+                toggleHistory(true);
+            } catch(e) {
+                console.error(e);
+                showToast(e.message || "Failed to process", "error");
+            }
+            btn.disabled = false; btn.innerText = translations[currentLang].request_payment || "Request Payment";
+        }
+
+        function renderSupportChannels() {
+            const container = document.getElementById('supportList');
+            container.innerHTML = '';
+            adminConfig.supportLinks.forEach(link => {
+                const div = document.createElement('div');
+                div.className = 'glass'; div.style.padding = '15px'; div.style.marginBottom = '10px';
+                div.style.display = 'flex'; div.style.alignItems = 'center'; div.style.cursor = 'pointer';
+                div.onclick = () => window.open(link.url, '_blank');
+                div.innerHTML = `
+                    <i class="${link.icon || 'fas fa-link'}" style="font-size:1.5rem; width:40px; color:var(--primary);"></i>
+                    <div style="font-weight:600; font-size:0.9rem;">${link.title}</div>
+                    <i class="fas fa-chevron-right" style="margin-left:auto; color:#666;"></i>
+                `;
+                container.appendChild(div);
+            });
+        }
+        function toggleHistory(show) {
+            const sheet = document.getElementById('historySheet');
+            const overlay = document.getElementById('sheetOverlay');
+            if(show) { sheet.classList.add('sheet-active'); overlay.classList.add('active'); loadHistory(); }
+            else { sheet.classList.remove('sheet-active'); overlay.classList.remove('active'); }
+        }
+        async function loadHistory() {
+            const list = document.getElementById('histList');
+            const sym = translations[currentLang].currency_sym;
+            list.innerHTML = '<p style="text-align:center;">Loading...</p>';
+            try {
+                const snap = await db.collection('withdrawals').where('uid', '==', currentUser).orderBy('date', 'desc').limit(20).get();
+                if(snap.empty) return list.innerHTML = '<p style="text-align:center; color:#666;">No transactions found</p>';
+                let html = '';
+                snap.forEach(d => {
+                    const data = d.data();
+                    const statusClass = data.status === 'paid' ? 'st-paid' : 'st-pending';
+                    html += `
+                    <div class="hist-item">
+                        <div><div style="font-weight:bold; text-transform:capitalize;">${data.method} (${data.number})</div>
+                        <div style="font-size:0.75rem; color:#666;">${data.source.toUpperCase()} Balance</div></div>
+                        <div style="text-align:right;"><div style="font-weight:bold;">${sym} ${data.amount}</div><span class="status-pill ${statusClass}">${data.status}</span></div>
+                    </div>`;
+                });
+                list.innerHTML = html;
+            } catch(e) { list.innerHTML = '<p style="text-align:center;">No History</p>'; }
+        }
+
+        function shareRef() {
+            const link = `https://t.me/${CONFIG.botUsername}/app?startapp=ref_${currentUser}`;
+            window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent("Join Orange Earn & get premium rewards! 🚀")}`);
+        }
+        function copyRef() {
+            const link = `https://t.me/${CONFIG.botUsername}/app?startapp=ref_${currentUser}`;
+            navigator.clipboard.writeText(link); showToast("Link Copied!", "success");
+        }
+        function copyUID() { navigator.clipboard.writeText(currentUser); showToast("UID Copied", "success"); }
+        function showToast(msg, type) {
+            const box = document.getElementById('toast-box');
+            const t = document.createElement('div');
+            t.className = 'toast'; t.style.borderLeftColor = type === 'success' ? 'var(--success)' : type === 'error' ? 'var(--danger)' : '#007AFF';
+            t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i><span>${msg}</span>`;
+            box.appendChild(t); setTimeout(() => t.remove(), 3000);
+        }
+    </script>
+</body>
+</html>
